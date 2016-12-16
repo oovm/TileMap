@@ -1,5 +1,5 @@
 [package]
-name = "tilemap-atlas"
+name = "tilemap"
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "..."

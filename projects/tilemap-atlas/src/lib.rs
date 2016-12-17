@@ -1,3 +1,5 @@
+#![feature(once_cell)]
+
 mod errors;
 
-pub use errors::{Error, Result};
+mod flat;

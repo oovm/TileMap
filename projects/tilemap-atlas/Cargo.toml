@@ -11,6 +11,7 @@ edition = "2021"
 
 [dependencies]
 image = "0.24.6"
+serde = "1.0.160"
 
 [dev-dependencies]
 

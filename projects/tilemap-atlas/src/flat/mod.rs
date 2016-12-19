@@ -1,6 +1,7 @@
 use std::cell::OnceCell;
 use std::path::Path;
-use image::{GenericImage, ImageError, ImageResult, Rgba, RgbaImage};
+use image::{GenericImage, GenericImageView, ImageError, ImageResult, Rgba, RgbaImage, SubImage};
+use image::error::{DecodingError, LimitError, LimitErrorKind};
 
 mod ser;
 mod der;
@@ -8,7 +9,9 @@ mod der;
 /// Must 6 * 8 = 48
 #[derive(Clone, Debug)]
 pub struct TileAtlas4x6 {
+    /// Raw image buffer.
     image: RgbaImage,
+    /// Cache for corner patterns.
     cache: [RgbaImage; 16],
 }
 
@@ -32,12 +35,17 @@ impl TileAtlas4x6 {
             image,
             cache: Default::default(),
         };
-        out.make_cache();
+        // SAFETY: dimensions already checked
+        unsafe {
+            out.make_cache();
+        }
         out
     }
     pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<Path> {
         let image = image::open(path)?.to_rgba8();
-
+        if image.width() % 4 != 0 || image.height() % 6 != 0 {
+            Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))?
+        }
         Ok(Self::new(image))
     }
     pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
@@ -46,21 +54,50 @@ impl TileAtlas4x6 {
 }
 
 impl TileAtlas4x6 {
-    pub fn get_pattern(&self, lu: bool, ld: bool, ru: bool, rd: bool) -> &RgbaImage {
-        let index = (lu as u8) << 3 | (ld as u8) << 2 | (ru as u8) << 1 | (rd as u8);
+    /// Get a tile by side relation mask.
+    ///
+    /// # Arguments
+    ///
+    /// - **R** = Right
+    /// - **U** = Up
+    /// - **L** = Left
+    /// - **D** = Down
+    ///
+    /// returns: &ImageBuffer<Rgba<u8>, Vec<u8, Global>>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    ///
+    /// ```
+    pub fn get_side(&self, r: bool, u: bool, l: bool, d: bool) -> &RgbaImage {
+        let lu = l && u;
+        let ru = r && u;
+        let ld = l && d;
+        let rd = r && d;
+        self.get_corner(lu, ld, ru, rd)
+    }
+    /// Get a tile by corner relation mask.
+    ///
+    /// # Arguments
+    ///
+    /// - **LU** = Left Up
+    /// - **LD** = Right Up
+    /// - **RU** = Left Down
+    /// - **RD** = Right Down
+    ///
+    /// returns: &ImageBuffer<Rgba<u8>, Vec<u8, Global>>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tilemap_atlas::TileAtlas4x6;
+    /// ```
+    pub fn get_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> &RgbaImage {
+        let index = (rd as u8) << 3 | (ld as u8) << 2 | (ru as u8) << 1 | (lu as u8);
         // SAFETY: index must in range `[0b0000, 0b1111]`
         unsafe {
             self.cache.get_unchecked(index as usize)
-        }
-    }
-    pub fn get(&self, index: usize) -> &RgbaImage {
-        match self.cache.get(index) {
-            Some(s) => {
-                s
-            }
-            None => {
-                panic!("index must in range `[0b0000, 0b1111]`");
-            }
         }
     }
     fn cell_width(&self) -> u32 {
@@ -69,7 +106,7 @@ impl TileAtlas4x6 {
     fn cell_height(&self) -> u32 {
         self.image.height() / 6
     }
-    fn make_cache(&mut self) {
+    unsafe fn make_cache(&mut self) {
         self.cache[00] = self.make_cell([(0, 0), (1, 0), (0, 1), (1, 1)]);
         self.cache[01] = self.make_cell([(3, 5), (1, 0), (0, 1), (1, 1)]);
         self.cache[02] = self.make_cell([(0, 0), (0, 5), (0, 1), (1, 1)]);
@@ -88,20 +125,17 @@ impl TileAtlas4x6 {
         self.cache[15] = self.make_cell([(1, 3), (2, 3), (1, 4), (2, 4)]);
     }
     // [left up, right up, left down, right down]
-    fn make_cell(&self, index: [(u32, u32); 4]) -> RgbaImage {
+    unsafe fn make_cell(&self, index: [(u32, u32); 4]) -> RgbaImage {
         let mut image = RgbaImage::new(self.cell_width() * 2, self.cell_height() * 2);
-        for (i, j) in index.iter() {
+        for (i, (x, y)) in index.iter().enumerate() {
+            let sx = x * self.cell_width();
+            let sy = y * self.cell_height();
             for dx in 0..self.cell_width() {
                 for dy in 0..self.cell_height() {
-                    // unsafe {
-                    //     let pixel = self.image.get_unchecked((sx + x, sy + y));
-                    //     image.get_unchecked_mut((x, y)).clone_from(pixel);
-                    // }
-                    // safe version
-                    let x = i * self.cell_width() + dx;
-                    let y = j * self.cell_height() + dy;
-                    let pixel = self.image.get_pixel(x, y);
-                    image.put_pixel(dx, dy, *pixel);
+                    let x = (i as u32 % 2) * self.cell_width() + dx;
+                    let y = (i as u32 / 2) * self.cell_height() + dy;
+                    let pixel = self.image.get_pixel(sx + dx, sy + dy);
+                    image.put_pixel(x, y, *pixel);
                 }
             }
         }
@@ -109,8 +143,26 @@ impl TileAtlas4x6 {
     }
 }
 
-
 /// Must 6 * 8 = 48
 pub struct TileAtlas6x8 {
     image: RgbaImage,
+}
+
+#[test]
+fn test() {
+    for r in [false, true] {
+        for u in [false, true] {
+            for l in [false, true] {
+                for d in [false, true] {
+                    let idx1 = (r as u8) << 3 | (u as u8) << 2 | (l as u8) << 1 | (d as u8);
+                    let lu = l && u;
+                    let ru = r && u;
+                    let ld = l && d;
+                    let rd = r && d;
+                    let idx2 = (lu as u8) << 3 | (ru as u8) << 2 | (ld as u8) << 1 | (rd as u8);
+                    println!("{} -> {}", idx1, idx2)
+                }
+            }
+        }
+    }
 }

@@ -42,7 +42,7 @@ impl TileCornerSet {
         }
         out
     }
-    /// load atlas from RPG Maker 2000/2003
+    /// Make set from RPG Maker 2000/2003 atlas
     unsafe fn make_rpg4x6(&mut self, raw: &RgbaImage) {
         self.images[00] = self.make_rpg4x6_cell(&raw, [(0, 0), (1, 0), (0, 1), (1, 1)]);
         self.images[01] = self.make_rpg4x6_cell(&raw, [(3, 5), (1, 0), (0, 1), (1, 1)]);
@@ -61,24 +61,23 @@ impl TileCornerSet {
         self.images[14] = self.make_rpg4x6_cell(&raw, [(0, 0), (0, 3), (1, 2), (2, 0)]);
         self.images[15] = self.make_rpg4x6_cell(&raw, [(1, 3), (2, 3), (1, 4), (2, 4)]);
     }
-    // [left up, right up, left down, right down]
-    unsafe fn make_rpg4x6_cell(&self, image: &RgbaImage, index: [(u32, u32); 4]) -> RgbaImage {
-        let w = image.width() / 4;
-        let h = image.height() / 6;
-        let mut image = RgbaImage::new(w * 2, h * 2);
-        for (i, (x, y)) in index.iter().enumerate() {
-            let sx = x * w;
-            let sy = y * h;
+    /// Make a cell from RPG Maker 2000/2003 atlas
+    /// - index: [left up, right up, left down, right down]
+    unsafe fn make_rpg4x6_cell(&self, raw: &RgbaImage, index: [(u32, u32); 4]) -> RgbaImage {
+        let w = raw.width() / 4;
+        let h = raw.height() / 6;
+        let mut out = RgbaImage::new(w * 2, h * 2);
+        for (k, (i, j)) in index.iter().enumerate() {
             for dx in 0..w {
                 for dy in 0..h {
-                    let x = (i as u32 % 2) * w + dx;
-                    let y = (i as u32 / 2) * h + dy;
-                    let pixel = image.get_pixel(sx + dx, sy + dy);
-                    image.put_pixel(x, y, *pixel);
+                    let x = (k as u32 % 2) * w + dx;
+                    let y = (k as u32 / 2) * h + dy;
+                    let pixel = raw.get_pixel(w * i + dx, h * j + dy);
+                    out.put_pixel(x, y, *pixel);
                 }
             }
         }
-        image
+        out
     }
     // pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<Path> {
     //     let image = image::open(path)?.to_rgba8();

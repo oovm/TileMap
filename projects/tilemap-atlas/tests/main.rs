@@ -1,5 +1,5 @@
 use std::path::Path;
-use tileset::TilesetEdge2;
+use tileset::TileCornerSet;
 
 #[test]
 fn ready() {
@@ -14,7 +14,8 @@ fn image() {
 }
 
 pub fn debug_atlas4x6(root: &Path) {
-    let atlas = TilesetEdge2::load(root.join("atlas.png")).unwrap();
+    let image = image::open(root.join("atlas.png")).unwrap().to_rgba8();
+    let atlas = TileCornerSet::from_rpg_maker(&image);
     for i in 0..16 {
         let r = (i & 8) != 0;
         let u = (i & 4) != 0;
@@ -29,7 +30,7 @@ pub fn debug_atlas4x6(root: &Path) {
         let ru = (i & 4) != 0;
         let ld = (i & 2) != 0;
         let rd = (i & 1) != 0;
-        let img = atlas.get_corner(lu, ru, ld, rd);
+        let img = atlas.get_inner_corner(lu, ru, ld, rd);
         let name = format!("corner-{}{}{}{}.png", lu as u8, ru as u8, ld as u8, rd as u8);
         img.save(root.join(name)).unwrap();
     }

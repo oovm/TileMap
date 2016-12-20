@@ -1,5 +1,5 @@
 use std::path::Path;
-use tilemap_atlas::TileAtlas4x6;
+use tileset::TilesetEdge2;
 
 #[test]
 fn ready() {
@@ -14,7 +14,7 @@ fn image() {
 }
 
 pub fn debug_atlas4x6(root: &Path) {
-    let atlas = TileAtlas4x6::load(root.join("atlas.png")).unwrap();
+    let atlas = TilesetEdge2::load(root.join("atlas.png")).unwrap();
     for i in 0..16 {
         let r = (i & 8) != 0;
         let u = (i & 4) != 0;

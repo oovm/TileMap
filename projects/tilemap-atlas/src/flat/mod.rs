@@ -1,21 +1,24 @@
-use std::cell::OnceCell;
 use std::path::Path;
-use image::{GenericImage, GenericImageView, ImageError, ImageResult, Rgba, RgbaImage, SubImage};
-use image::error::{DecodingError, LimitError, LimitErrorKind};
+use image::{ImageError, ImageResult, RgbaImage};
+use image::error::{LimitError, LimitErrorKind};
 
+#[cfg(feature = "serde")]
 mod ser;
+#[cfg(feature = "serde")]
 mod der;
 
-/// Must 6 * 8 = 48
+/// A tile set which commonly used in rpg maker
 #[derive(Clone, Debug)]
-pub struct TileAtlas4x6 {
+pub struct TilesetEdge2 {
     /// Raw image buffer.
     image: RgbaImage,
     /// Cache for corner patterns.
     cache: [RgbaImage; 16],
+    /// random selection for full tiles.
+    fulls: Vec<RgbaImage>,
 }
 
-impl TileAtlas4x6 {
+impl TilesetEdge2 {
     /// Create a new tile atlas from a image.
     ///
     /// ## Panics
@@ -28,12 +31,13 @@ impl TileAtlas4x6 {
     /// use tilemap_atlas::TileAtlas4x6;
     /// use image::RgbaImage;
     /// ```
-    pub fn new(image: RgbaImage) -> Self {
+    pub fn from_rpg_maker(image: RgbaImage) -> Self {
         assert_eq!(image.width() % 4, 0, "image width {} does not divide by 4", image.width());
         assert_eq!(image.height() % 6, 0, "image height {} does not divide by 6", image.height());
         let mut out = Self {
             image,
             cache: Default::default(),
+            fulls: vec![],
         };
         // SAFETY: dimensions already checked
         unsafe {
@@ -46,14 +50,14 @@ impl TileAtlas4x6 {
         if image.width() % 4 != 0 || image.height() % 6 != 0 {
             Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))?
         }
-        Ok(Self::new(image))
+        Ok(Self::from_rpg_maker(image))
     }
     pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
         self.image.save(path)
     }
 }
 
-impl TileAtlas4x6 {
+impl TilesetEdge2 {
     /// Get a tile by side relation mask.
     ///
     /// # Arguments

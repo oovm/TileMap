@@ -1,11 +1,22 @@
+use std::fmt::Formatter;
 use serde::{Deserialize, Deserializer};
-use crate::TileAtlas4x6;
+use serde::de::Visitor;
+use super::*;
 
-impl<'de> Deserialize<'de> for TileAtlas4x6 {
+struct VisitorAtlas4x6;
+
+impl<'de> Deserialize<'de> for TilesetEdge2 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
-        todo!()
+        deserializer.deserialize_map(VisitorAtlas4x6)
     }
 }
 
-struct VisitorAtlas4x6;
+
+impl<'de> Visitor<'de> for VisitorAtlas4x6 {
+    type Value = TilesetEdge2;
+
+    fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
+        formatter.write_str("except TileAtlas4x6 {width, height, image}")
+    }
+}
 

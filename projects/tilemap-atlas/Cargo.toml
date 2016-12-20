@@ -1,17 +1,18 @@
 [package]
-name = "tilemap-atlas"
+name = "tileset"
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
-description = "..."
+description = "Tailset definition, and supports importing multiple formats"
 repository = "https://github.com/oovm/Tilemap"
-documentation = "https://docs.rs/tilemap"
+documentation = "https://docs.rs/tileset"
 readme = "Readme.md"
 license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
+rand_core = "0.6.4"
 image = "0.24.6"
-serde = "1.0.160"
+serde = { version = "1.0.160", optional = true }
 
 [dev-dependencies]
 

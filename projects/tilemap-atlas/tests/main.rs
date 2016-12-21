@@ -18,6 +18,7 @@ fn image() {
 pub fn debug_atlas4x6(root: &Path) -> ImageResult<()> {
     let image = image::open(root.join("atlas.png"))?.to_rgba8();
     let atlas = TileCornerSet::from_rpg_maker(&image);
+    atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
         let r = (i & 8) != 0;
         let u = (i & 4) != 0;

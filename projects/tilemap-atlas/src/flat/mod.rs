@@ -1,5 +1,5 @@
 use std::path::Path;
-use image::{ImageError, ImageResult, RgbaImage};
+use image::{GenericImage, GenericImageView, ImageError, ImageResult, RgbaImage};
 use image::error::{LimitError, LimitErrorKind};
 
 #[cfg(feature = "serde")]
@@ -15,6 +15,51 @@ pub struct TileCornerSet {
 
 pub struct TailCornerRandomSet {
     images: [Vec<RgbaImage>; 16],
+}
+
+impl TileCornerSet {
+    pub fn new(image: &RgbaImage) -> Self {
+        assert_eq!(image.width() % 4, 0, "image width {} does not divide by 4", image.width());
+        assert_eq!(image.height() % 4, 0, "image height {} does not divide by 4", image.height());
+        let mut out = Self {
+            images: Default::default(),
+        };
+        // SAFETY: dimensions already checked
+        for i in 0..16 {
+            let x = (i % 4) as u32 * image.width() / 4;
+            let y = (i / 4) as u32 * image.height() / 4;
+            out.images[i] = image.view(x, y, image.width() / 4, image.height() / 4).to_image();
+        }
+        out
+    }
+    pub fn as_image(&self) -> RgbaImage {
+        let (w, h) = self.cell_size();
+        let mut out = RgbaImage::new(w * 4, h * 4);
+        for (i, image) in self.images.iter().enumerate() {
+            let x = (i % 4) as u32 * w;
+            let y = (i / 4) as u32 * h;
+            out.copy_from(image, x, y).unwrap();
+        }
+        out
+    }
+    pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
+        self.as_image().save(path)
+    }
+    pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<Path> {
+        let image = image::open(path)?.to_rgba8();
+        if image.width() % 4 != 0 || image.height() % 4 != 0 {
+            Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))?
+        }
+        Ok(Self::new(&image))
+    }
+}
+
+impl TileCornerSet {
+    pub fn cell_size(&self) -> (u32, u32) {
+        let w = self.images[0].width();
+        let h = self.images[0].height();
+        (w, h)
+    }
 }
 
 impl TileCornerSet {
@@ -79,16 +124,6 @@ impl TileCornerSet {
         }
         out
     }
-    // pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<Path> {
-    //     let image = image::open(path)?.to_rgba8();
-    //     if image.width() % 4 != 0 || image.height() % 6 != 0 {
-    //         Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))?
-    //     }
-    //     Ok(Self::from_rpg_maker(image))
-    // }
-    // pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
-    //     self.image.save(path)
-    // }
 }
 
 impl TileCornerSet {

@@ -19,8 +19,10 @@ taxicab-map = "0.1.3"
 [dependencies.tileset]
 version = "0.0.0"
 path = "../tilemap-atlas"
+features = []
 
 [dev-dependencies]
 
 [features]
-default = []
+default = ["serde"]
+serde = ["ndarray/serde", "tileset/serde"]

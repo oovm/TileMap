@@ -1,7 +1,7 @@
 use super::*;
 
 
-impl GridCornerAtlas {
+impl TailCornerAtlas {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics
@@ -66,7 +66,7 @@ impl GridCornerAtlas {
 }
 
 
-impl GridCornerAtlas {
+impl TailCornerAtlas {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics

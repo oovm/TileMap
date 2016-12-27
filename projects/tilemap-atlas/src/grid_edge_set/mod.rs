@@ -1,5 +1,8 @@
 use image::{GenericImageView, RgbaImage, SubImage};
 use crate::GridAtlas;
+use image::{GenericImage, ImageResult};
+use crate::utils::dimension_error;
+use std::path::Path;
 
 mod ser;
 mod der;

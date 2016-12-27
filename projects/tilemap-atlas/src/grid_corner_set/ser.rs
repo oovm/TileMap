@@ -4,7 +4,7 @@ use serde::Serialize;
 use super::*;
 
 
-impl Serialize for GridCornerAtlas {
+impl Serialize for TailCornerAtlas {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct("TileAtlas4x6", 1)?;
         state.serialize_field("width", &self.image.width())?;

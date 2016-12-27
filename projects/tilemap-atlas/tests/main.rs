@@ -1,6 +1,6 @@
 use std::path::Path;
 use image::ImageResult;
-use tileset::{GridAtlas, GridCornerAtlas, GridEdgeAtlas};
+use tileset::{GridAtlas, TailCornerAtlas, GridEdgeAtlas};
 
 #[test]
 fn ready() {
@@ -17,7 +17,7 @@ fn image() {
 
 pub fn debug_atlas4x6(root: &Path) -> ImageResult<()> {
     let image = image::open(root.join("atlas.png"))?.to_rgba8();
-    let atlas = GridCornerAtlas::from_rpg_maker_xp(&image);
+    let atlas = TailCornerAtlas::from_rpg_maker_xp(&image);
     atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
         let r = (i & 8) != 0;

@@ -25,22 +25,23 @@ mod display;
 /// Suppose we have such an atlas in standard form called `atlas-std.png`;
 ///
 /// ```no_run
-/// # use tileset::GridCornerAtlas;
-/// let atlas = GridCornerAtlas::load("atlas-std.png").unwrap();
+/// # use tileset::TailCornerAtlas;
+/// let atlas = TailCornerAtlas::load("atlas-std.png").unwrap();
 /// let cell = atlas.get_side(true, true, false, true);
 /// cell.save("side-1101.png").unwrap();
 /// ```
 #[derive(Clone, Debug)]
-pub struct GridCornerAtlas {
+pub struct TailCornerAtlas {
     images: [RgbaImage; 16],
 }
 
 #[derive(Clone, Debug)]
-pub struct TailCornerRandomAtlas {
-    images: [Vec<RgbaImage>; 16],
+pub struct GridCornerAtlas {
+    image: RgbaImage,
+    count: usize,
 }
 
-impl GridCornerAtlas {
+impl TailCornerAtlas {
     pub fn new(image: &RgbaImage) -> Self {
         assert_eq!(image.width() % 4, 0, "image width {} does not divide by 4", image.width());
         assert_eq!(image.height() % 4, 0, "image height {} does not divide by 4", image.height());
@@ -78,7 +79,7 @@ impl GridCornerAtlas {
     }
 }
 
-impl GridCornerAtlas {
+impl TailCornerAtlas {
     pub fn cell_size(&self) -> (u32, u32) {
         let w = self.images[0].width();
         let h = self.images[0].height();
@@ -86,7 +87,7 @@ impl GridCornerAtlas {
     }
 }
 
-impl GridCornerAtlas {
+impl TailCornerAtlas {
     /// Get a tile by side relation mask.
     ///
     /// # Arguments
@@ -135,8 +136,7 @@ impl GridCornerAtlas {
     }
 }
 
-impl GridCornerAtlas {}
-
+impl TailCornerAtlas {}
 
 
 #[test]

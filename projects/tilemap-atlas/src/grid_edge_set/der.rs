@@ -1,10 +1,7 @@
-use image::error::LimitError;
-use image::{GenericImage, GenericImageView, ImageResult, SubImage};
-use rand_core::RngCore;
-use crate::utils::dimension_error;
 use super::*;
 
 impl GridEdgeAtlas {
+
     // pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<std::path::Path> {
     //     let image = image::open(path)?.to_rgba8();
     //     let cell_size = image.width() / 16;
@@ -27,6 +24,7 @@ impl GridEdgeAtlas {
 
 
 
+
 impl GridEdgeAtlas {
     /// A 4*4
     pub fn from_wang(wang: &RgbaImage) -> ImageResult<Self> {
@@ -38,9 +36,9 @@ impl GridEdgeAtlas {
             image: RgbaImage::new(cell_size * 16, cell_size),
             count: [1; 16],
         };
-        for index in 0..16 {
-            let view = make_wing_cell(wang, index, cell_size);
-            out.image.copy_from(&view.to_image(), index, 0).unwrap();
+        for i in 0..16 {
+            let view = make_wing_cell(wang, i, cell_size);
+            out.image.copy_from(&view.to_image(), i * cell_size, 0)?;
         }
         Ok(out)
     }

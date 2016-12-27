@@ -3,7 +3,7 @@ pub mod utils;
 
 pub use image::{RgbaImage, SubImage};
 use rand_core::RngCore;
-pub use crate::grid_corner_set::{GridCornerAtlas, TailCornerRandomAtlas};
+pub use crate::grid_corner_set::{TailCornerAtlas, GridCornerAtlas};
 
 mod grid_edge_set;
 pub use crate::grid_edge_set::GridEdgeAtlas;

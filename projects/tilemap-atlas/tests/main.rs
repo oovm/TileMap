@@ -51,12 +51,12 @@ pub fn debug_wang(root: &Path) -> ImageResult<()> {
     let atlas = GridEdgeAtlas::from_wang(&image)?;
     atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
-        let r = (i & 8) != 0;
-        let u = (i & 4) != 0;
-        let l = (i & 2) != 0;
-        let d = (i & 1) != 0;
+        let r = (i & 1) != 0;
+        let u = (i & 2) != 0;
+        let l = (i & 4) != 0;
+        let d = (i & 8) != 0;
         let img = atlas.get_side(l, u, r, d, 0);
-        let name = format!("side-{}{}{}{}.png", l as u8, u as u8, r as u8, d as u8);
+        let name = format!("side-{}{}{}{}.png", d as u8, r as u8, u as u8, l as u8);
         img.to_image().save(root.join(name))?;
     }
     Ok(())

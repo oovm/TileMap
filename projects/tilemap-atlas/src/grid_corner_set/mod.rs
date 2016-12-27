@@ -10,6 +10,12 @@ mod der;
 mod loader;
 mod display;
 
+
+#[derive(Clone, Debug)]
+pub struct TailCornerAtlas {
+    images: [RgbaImage; 16],
+}
+
 /// A tile atlas for gridded maps
 ///
 /// It determine the pattern of the four corners of this grid according weather four sides (left, upper, left, lower) have the same elements.
@@ -28,13 +34,8 @@ mod display;
 /// # use tileset::TailCornerAtlas;
 /// let atlas = TailCornerAtlas::load("atlas-std.png").unwrap();
 /// let cell = atlas.get_side(true, true, false, true);
-/// cell.save("side-1101.png").unwrap();
+/// cell.save("side-1011.png").unwrap();
 /// ```
-#[derive(Clone, Debug)]
-pub struct TailCornerAtlas {
-    images: [RgbaImage; 16],
-}
-
 #[derive(Clone, Debug)]
 pub struct GridCornerAtlas {
     image: RgbaImage,
@@ -137,23 +138,3 @@ impl TailCornerAtlas {
 }
 
 impl TailCornerAtlas {}
-
-
-#[test]
-fn test() {
-    for r in [false, true] {
-        for u in [false, true] {
-            for l in [false, true] {
-                for d in [false, true] {
-                    let idx1 = (r as u8) << 3 | (u as u8) << 2 | (l as u8) << 1 | (d as u8);
-                    let lu = l && u;
-                    let ru = r && u;
-                    let ld = l && d;
-                    let rd = r && d;
-                    let idx2 = (lu as u8) << 3 | (ru as u8) << 2 | (ld as u8) << 1 | (rd as u8);
-                    println!("{} -> {}", idx1, idx2)
-                }
-            }
-        }
-    }
-}

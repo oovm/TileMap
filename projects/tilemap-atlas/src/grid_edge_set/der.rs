@@ -26,38 +26,23 @@ impl GridEdgeAtlas {
 }
 
 
-impl GridEdgeAtlas {
-    pub fn get_side(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
-        let s = self.cell_size();
-        let i = ((l as u8) | (u as u8) << 1 | (r as u8) << 2 | (d as u8) << 3) as u32;
-        let j = n % *self.count.get(i).unwrap() as u32;
-        self.image.view(i * s, j * s, s, s)
-    }
-    pub fn get_side_random<R>(&self, l: bool, u: bool, r: bool, d: bool, rng: &mut R) -> SubImage<&RgbaImage> where R: RngCore {
-        self.get_side(l, u, r, d, rng.next_u32())
-    }
-}
 
 impl GridEdgeAtlas {
     /// A 4*4
     pub fn from_wang(wang: &RgbaImage) -> ImageResult<Self> {
         let cell_size = wang.width() / 4;
-        if wang.width() % 4 != 0 && wang.width() != wang.height() {
+        if wang.width() % 4 != 0 || wang.width() != wang.height() {
             dimension_error()?
         }
-        let mut image = RgbaImage::new(cell_size * 16, cell_size);
-        let mut count = [0; 16];
-        for (index, cell) in count.iter_mut().enumerate() {
+        let mut out = Self {
+            image: RgbaImage::new(cell_size * 16, cell_size),
+            count: [1; 16],
+        };
+        for index in 0..16 {
             let view = make_wing_cell(wang, index, cell_size);
-            let x = (index % 4) as u32 * cell_size;
-            let y = (index / 4) as u32 * cell_size;
-            image.copy_from(&view.to_image(), x, y)?;
-            *cell = 1;
+            out.image.copy_from(&view.to_image(), index, 0).unwrap();
         }
-        // SAFETY: definitely safe
-        unsafe {
-            Ok(Self::create(image, count))
-        }
+        Ok(out)
     }
 }
 
@@ -77,7 +62,7 @@ impl GridEdgeAtlas {
 // 0b1101 <- 14 <- (2, 0)
 // 0b1110 <- 13 <- (3, 1)
 // 0b1111 <- 15 <- (2, 1)
-fn make_wing_cell(raw: &RgbaImage, id: usize, s: u32) -> SubImage<&RgbaImage> {
+fn make_wing_cell(raw: &RgbaImage, id: u32, s: u32) -> SubImage<&RgbaImage> {
     match id {
         0b0000 => raw.view(0 * s, 3 * s, s, s),
         0b0001 => raw.view(1 * s, 3 * s, s, s),

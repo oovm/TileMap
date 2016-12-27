@@ -8,18 +8,39 @@ mod ser;
 mod der;
 
 mod loader;
+mod display;
 
-/// A tile set which commonly used in rpg maker
+/// A tile atlas for gridded maps
+///
+/// It determine the pattern of the four corners of this grid according weather four sides (left, upper, left, lower) have the same elements.
+///
+/// ## Load
+///
+/// - Standard Form
+/// - RPG Maker XP
+/// - RPG Maker MV
+///
+/// ## Examples
+///
+/// Suppose we have such an atlas in standard form called `atlas-std.png`;
+///
+/// ```no_run
+/// # use tileset::GridCornerAtlas;
+/// let atlas = GridCornerAtlas::load("atlas-std.png").unwrap();
+/// let cell = atlas.get_side(true, true, false, true);
+/// cell.save("side-1101.png").unwrap();
+/// ```
 #[derive(Clone, Debug)]
-pub struct TileCornerSet {
+pub struct GridCornerAtlas {
     images: [RgbaImage; 16],
 }
 
-pub struct TailCornerRandomSet {
+#[derive(Clone, Debug)]
+pub struct TailCornerRandomAtlas {
     images: [Vec<RgbaImage>; 16],
 }
 
-impl TileCornerSet {
+impl GridCornerAtlas {
     pub fn new(image: &RgbaImage) -> Self {
         assert_eq!(image.width() % 4, 0, "image width {} does not divide by 4", image.width());
         assert_eq!(image.height() % 4, 0, "image height {} does not divide by 4", image.height());
@@ -57,7 +78,7 @@ impl TileCornerSet {
     }
 }
 
-impl TileCornerSet {
+impl GridCornerAtlas {
     pub fn cell_size(&self) -> (u32, u32) {
         let w = self.images[0].width();
         let h = self.images[0].height();
@@ -65,7 +86,7 @@ impl TileCornerSet {
     }
 }
 
-impl TileCornerSet {
+impl GridCornerAtlas {
     /// Get a tile by side relation mask.
     ///
     /// # Arguments
@@ -114,12 +135,9 @@ impl TileCornerSet {
     }
 }
 
-impl TileCornerSet {}
+impl GridCornerAtlas {}
 
-/// Must 6 * 8 = 48
-pub struct TileAtlas6x8 {
-    image: RgbaImage,
-}
+
 
 #[test]
 fn test() {

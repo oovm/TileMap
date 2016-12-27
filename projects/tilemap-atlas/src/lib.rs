@@ -1,5 +1,5 @@
-mod corner_set;
+mod grid_corner_set;
 pub mod utils;
 
-pub use crate::corner_set::{TileCornerSet, TileAtlas6x8, TailCornerRandomSet};
-mod edge_set;
+pub use crate::grid_corner_set::{GridCornerAtlas, TailCornerRandomAtlas};
+mod grid_edge_set;

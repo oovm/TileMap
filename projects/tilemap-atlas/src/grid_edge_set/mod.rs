@@ -51,13 +51,11 @@ impl GridEdgeAtlas {
     }
 }
 
-impl GridEdgeAtlas {
-    pub fn cell_size(&self) -> u32 {
+impl GridAtlas for GridEdgeAtlas {
+    fn cell_size(&self) -> u32 {
         self.image.width() / 16
     }
-}
 
-impl GridAtlas for GridEdgeAtlas {
     fn get_side(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
         let s = self.cell_size();
         let i = ((l as u8) | (u as u8) << 1 | (r as u8) << 2 | (d as u8) << 3) as u32;

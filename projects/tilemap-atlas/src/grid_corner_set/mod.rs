@@ -1,20 +1,16 @@
+use image::{GenericImageView, RgbaImage, SubImage};
+use crate::GridAtlas;
+use crate::utils::check_width_divide_by_16;
 use std::path::Path;
-use image::{GenericImage, GenericImageView, ImageError, ImageResult, RgbaImage};
-use image::error::{LimitError, LimitErrorKind};
+use image::ImageResult;
 
-#[cfg(feature = "serde")]
 mod ser;
-#[cfg(feature = "serde")]
+
 mod der;
 
 mod loader;
 mod display;
 
-
-#[derive(Clone, Debug)]
-pub struct TailCornerAtlas {
-    images: [RgbaImage; 16],
-}
 
 /// A tile atlas for gridded maps
 ///
@@ -39,54 +35,74 @@ pub struct TailCornerAtlas {
 #[derive(Clone, Debug)]
 pub struct GridCornerAtlas {
     image: RgbaImage,
-    count: usize,
+    count: [u8; 16],
 }
 
-impl TailCornerAtlas {
-    pub fn new(image: &RgbaImage) -> Self {
-        assert_eq!(image.width() % 4, 0, "image width {} does not divide by 4", image.width());
-        assert_eq!(image.height() % 4, 0, "image height {} does not divide by 4", image.height());
-        let mut out = Self {
-            images: Default::default(),
+impl Default for GridCornerAtlas {
+    fn default() -> Self {
+        Self {
+            image: RgbaImage::new(16, 1),
+            count: [1; 16],
+        }
+    }
+}
+
+impl GridCornerAtlas {
+    pub fn new(image: RgbaImage, count: [u8; 16]) -> Self {
+        check_width_divide_by_16(&image);
+        Self {
+            image,
+            count,
+        }
+    }
+    /// Create a grid corner atlas without check
+    pub unsafe fn create(image: RgbaImage, count: [u8; 16]) -> Self {
+        Self {
+            image,
+            count,
+        }
+    }
+}
+
+impl GridAtlas for GridCornerAtlas {
+    fn cell_size(&self) -> u32 {
+        self.image.width() / 16
+    }
+
+    fn get_side(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
+        let s = self.cell_size();
+        let i = match (l, u, r, d) {
+            (false, false, false, false) => { 0b0000 }
+            (false, false, false, true) => { 0b0011 }
+            (false, false, true, false) => { 0b1010 }
+            (false, false, true, true) => { 0b1011 }
+            (false, true, false, false) => { 0b0100 }
+            (false, true, false, true) => { 0b0111 }
+            (false, true, true, false) => { 0b1110 }
+            (false, true, true, true) => { 0b1111 }
+            (true, false, false, false) => { 0b1000 }
+            (true, false, false, true) => { 0b1011 }
+            (true, false, true, false) => { 0b1001 }
+            (true, false, true, true) => { 0b1011 }
+            (true, true, false, false) => { 0b1100 }
+            (true, true, false, true) => { 0b1111 }
+            (true, true, true, false) => { 0b1101 }
+            (true, true, true, true) => { 0b1111 }
         };
-        // SAFETY: dimensions already checked
-        for i in 0..16 {
-            let x = (i % 4) as u32 * image.width() / 4;
-            let y = (i / 4) as u32 * image.height() / 4;
-            out.images[i] = image.view(x, y, image.width() / 4, image.height() / 4).to_image();
-        }
-        out
-    }
-    pub fn as_image(&self) -> RgbaImage {
-        let (w, h) = self.cell_size();
-        let mut out = RgbaImage::new(w * 4, h * 4);
-        for (i, image) in self.images.iter().enumerate() {
-            let x = (i % 4) as u32 * w;
-            let y = (i / 4) as u32 * h;
-            // SAFETY: dimensions checked inside `copy_from`
-            out.copy_from(image, x, y).unwrap()
-        }
-        out
-    }
-    pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
-        self.as_image().save(path)
-    }
-    pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<Path> {
-        let image = image::open(path)?.to_rgba8();
-        if image.width() % 4 != 0 || image.height() % 4 != 0 {
-            Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))?
-        }
-        Ok(Self::new(&image))
+        // SAFETY: index must be in range
+        let j = n % unsafe {
+            *self.count.get_unchecked(i as usize) as u32
+        };
+        self.image.view(i * s, j * s, s, s)
     }
 }
 
-impl TailCornerAtlas {
-    pub fn cell_size(&self) -> (u32, u32) {
-        let w = self.images[0].width();
-        let h = self.images[0].height();
-        (w, h)
-    }
+
+#[derive(Clone, Debug)]
+pub struct TailCornerAtlas {
+    images: [RgbaImage; 16],
 }
+
 
 impl TailCornerAtlas {
     /// Get a tile by side relation mask.
@@ -136,5 +152,3 @@ impl TailCornerAtlas {
         }
     }
 }
-
-impl TailCornerAtlas {}

@@ -1,6 +1,6 @@
 use std::path::Path;
 use image::ImageResult;
-use tileset::{GridAtlas, TailCornerAtlas, GridEdgeAtlas};
+use tileset::{GridAtlas, TailCornerAtlas, GridEdgeAtlas, GridCornerAtlas};
 
 #[test]
 fn ready() {
@@ -18,7 +18,7 @@ fn image() {
 pub fn debug_atlas4x6(root: &Path) -> ImageResult<()> {
     let image = image::open(root.join("atlas.png"))?.to_rgba8();
     let atlas = TailCornerAtlas::from_rpg_maker_xp(&image);
-    atlas.save(root.join("atlas-std.png"))?;
+    // atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
         let r = (i & 8) != 0;
         let u = (i & 4) != 0;
@@ -28,14 +28,27 @@ pub fn debug_atlas4x6(root: &Path) -> ImageResult<()> {
         let name = format!("side-{}{}{}{}.png", r as u8, u as u8, l as u8, d as u8);
         img.save(root.join(name))?;
     }
+    Ok(())
+}
+
+#[test]
+fn test_atlas() {
+    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+    debug_wang2(&here.join("tests/atlas3")).unwrap();
+}
+
+pub fn debug_wang2(root: &Path) -> ImageResult<()> {
+    let image = image::open(root.join("wang2c.png"))?.to_rgba8();
+    let atlas = GridCornerAtlas::from_wang(&image)?;
+    atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
-        let lu = (i & 8) != 0;
-        let ru = (i & 4) != 0;
-        let ld = (i & 2) != 0;
-        let rd = (i & 1) != 0;
-        let img = atlas.get_inner_corner(lu, ru, ld, rd);
-        let name = format!("corner-{}{}{}{}.png", lu as u8, ru as u8, ld as u8, rd as u8);
-        img.save(root.join(name))?
+        let r = (i & 1) != 0;
+        let u = (i & 2) != 0;
+        let l = (i & 4) != 0;
+        let d = (i & 8) != 0;
+        let img = atlas.get_side(l, u, r, d, 0);
+        let name = format!("side-{}{}{}{}.png", d as u8, r as u8, u as u8, l as u8);
+        img.to_image().save(root.join(name))?;
     }
     Ok(())
 }

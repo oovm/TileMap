@@ -38,7 +38,7 @@ fn test_atlas() {
 }
 
 pub fn debug_wang2(root: &Path) -> ImageResult<()> {
-    let image = image::open(root.join("wang2c.png"))?.to_rgba8();
+    let image = image::open(root.join("atlas.png"))?.to_rgba8();
     let atlas = GridCornerAtlas::from_wang(&image)?;
     atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {

@@ -76,8 +76,8 @@ impl GridAtlas for GridCornerAtlas {
             (false, false, false, true) => { 0b0011 }
             (false, false, true, false) => { 0b1010 }
             (false, false, true, true) => { 0b1011 }
-            (false, true, false, false) => { 0b0100 }
-            (false, true, false, true) => { 0b0111 }
+            (false, true, false, false) => { 0b1100 }
+            (false, true, false, true) => { 0b1111 }
             (false, true, true, false) => { 0b1110 }
             (false, true, true, true) => { 0b1111 }
             (true, false, false, false) => { 0b1000 }

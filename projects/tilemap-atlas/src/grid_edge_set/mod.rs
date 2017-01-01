@@ -56,7 +56,7 @@ impl GridAtlas for GridEdgeAtlas {
         self.image.width() / 16
     }
 
-    fn get_side(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
+    fn get_cell(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
         let s = self.cell_size();
         let i = ((l as u8) | (u as u8) << 1 | (r as u8) << 2 | (d as u8) << 3) as u32;
         // SAFETY: index must be in range

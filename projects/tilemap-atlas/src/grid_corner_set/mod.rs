@@ -69,26 +69,9 @@ impl GridAtlas for GridCornerAtlas {
         self.image.width() / 16
     }
 
-    fn get_side(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
+    fn get_cell(&self, lu: bool, ru: bool, ld: bool, rd: bool, n: u32) -> SubImage<&RgbaImage> {
         let s = self.cell_size();
-        let i = match (l, u, r, d) {
-            (false, false, false, false) => { 0b0000 }
-            (false, false, false, true) => { 0b0011 }
-            (false, false, true, false) => { 0b1010 }
-            (false, false, true, true) => { 0b1011 }
-            (false, true, false, false) => { 0b1100 }
-            (false, true, false, true) => { 0b1111 }
-            (false, true, true, false) => { 0b1110 }
-            (false, true, true, true) => { 0b1111 }
-            (true, false, false, false) => { 0b1000 }
-            (true, false, false, true) => { 0b1011 }
-            (true, false, true, false) => { 0b1001 }
-            (true, false, true, true) => { 0b1011 }
-            (true, true, false, false) => { 0b1100 }
-            (true, true, false, true) => { 0b1111 }
-            (true, true, true, false) => { 0b1101 }
-            (true, true, true, true) => { 0b1111 }
-        };
+        let i = ((lu as u8) | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3) as u32;
         // SAFETY: index must be in range
         let j = n % unsafe {
             *self.count.get_unchecked(i as usize) as u32

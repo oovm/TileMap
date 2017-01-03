@@ -7,8 +7,6 @@ use image::ImageResult;
 mod ser;
 
 mod der;
-
-mod loader;
 mod display;
 
 
@@ -80,58 +78,3 @@ impl GridAtlas for GridCornerAtlas {
     }
 }
 
-
-#[derive(Clone, Debug)]
-pub struct TailCornerAtlas {
-    images: [RgbaImage; 16],
-}
-
-
-impl TailCornerAtlas {
-    /// Get a tile by side relation mask.
-    ///
-    /// # Arguments
-    ///
-    /// - **R** = Right
-    /// - **U** = Up
-    /// - **L** = Left
-    /// - **D** = Down
-    ///
-    /// returns: &ImageBuffer<Rgba<u8>, Vec<u8, Global>>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///
-    /// ```
-    pub fn get_side(&self, r: bool, u: bool, l: bool, d: bool) -> &RgbaImage {
-        let lu = l && u;
-        let ru = r && u;
-        let ld = l && d;
-        let rd = r && d;
-        self.get_inner_corner(lu, ld, ru, rd)
-    }
-    /// Get a tile by corner relation mask.
-    ///
-    /// # Arguments
-    ///
-    /// - **LU** = Left Up
-    /// - **LD** = Right Up
-    /// - **RU** = Left Down
-    /// - **RD** = Right Down
-    ///
-    /// returns: &ImageBuffer<Rgba<u8>, Vec<u8, Global>>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use tilemap_atlas::TileAtlas4x6;
-    /// ```
-    pub fn get_inner_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> &RgbaImage {
-        let index = (rd as u8) << 3 | (ld as u8) << 2 | (ru as u8) << 1 | (lu as u8);
-        // SAFETY: index must in range `[0b0000, 0b1111]`
-        unsafe {
-            self.images.get_unchecked(index as usize)
-        }
-    }
-}

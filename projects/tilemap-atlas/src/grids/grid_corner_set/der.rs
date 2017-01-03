@@ -1,36 +1,33 @@
-use std::fmt::Formatter;
-use image::{GenericImage, ImageResult};
-use serde::{Deserialize, Deserializer};
-use serde::de::Visitor;
-use crate::utils::{check_wang4x4, dimension_error};
 use super::*;
+use crate::utils::check_wang4x4;
+use image::{GenericImage, ImageResult};
+use serde::{de::Visitor, Deserialize, Deserializer};
+use std::fmt::Formatter;
 
-struct VisitorAtlas4x6;
+struct VisitorGridAtlas;
 
-impl<'de> Deserialize<'de> for TailCornerAtlas {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
-        deserializer.deserialize_map(VisitorAtlas4x6)
+impl<'de> Deserialize<'de> for GridCornerAtlas {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_map(VisitorGridAtlas)
     }
 }
 
-
-impl<'de> Visitor<'de> for VisitorAtlas4x6 {
-    type Value = TailCornerAtlas;
+impl<'de> Visitor<'de> for VisitorGridAtlas {
+    type Value = GridCornerAtlas;
 
     fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
         formatter.write_str("except TileAtlas4x6 {width, height, image}")
     }
 }
 
-
 impl GridCornerAtlas {
     /// A 4*4
     pub fn from_wang(wang: &RgbaImage) -> ImageResult<Self> {
         let cell_size = check_wang4x4(wang)?;
-        let mut out = Self {
-            image: RgbaImage::new(cell_size * 16, cell_size),
-            count: [1; 16],
-        };
+        let mut out = Self { image: RgbaImage::new(cell_size * 16, cell_size), count: [1; 16] };
         for i in 0..16 {
             let view = make_wing_cell(wang, i, cell_size);
             out.image.copy_from(&view.to_image(), i * cell_size, 0)?;
@@ -89,17 +86,14 @@ impl GridCornerAtlas {
     /// ## Example
     ///
     /// ```no_run
-    /// use tilemap_atlas::TileAtlas4x6;
     /// use image::RgbaImage;
+    /// use tilemap_atlas::TileAtlas4x6;
     /// ```
     pub fn from_rpg_maker_xp(rpg: &RgbaImage) -> ImageResult<Self> {
         assert_eq!(rpg.width() % 4, 0, "image width {} does not divide by 4", rpg.width());
         assert_eq!(rpg.height() % 6, 0, "image height {} does not divide by 6", rpg.height());
         let half_cell = rpg.width() / 4;
-        let mut out = Self {
-            image: RgbaImage::new(half_cell * 16 * 2, half_cell * 2),
-            count: [1; 16],
-        };
+        let mut out = Self { image: RgbaImage::new(half_cell * 16 * 2, half_cell * 2), count: [1; 16] };
         for i in 0..16 {
             let view = make_rpg4x6_cell(rpg, i, half_cell)?;
             out.image.copy_from(&view, i * half_cell * 2, 0)?;

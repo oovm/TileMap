@@ -1,11 +1,8 @@
-mod grid_corner_set;
 mod utils;
-
+pub use crate::{
+    grids::{bg_set::GridBackgroundAtlas, grid_corner_set::GridCornerAtlas, grid_edge_set::GridEdgeAtlas},
+    utils::GridAtlas,
+};
 pub use image::{RgbaImage, SubImage};
-pub use crate::grid_corner_set::{TailCornerAtlas, GridCornerAtlas};
-pub use crate::utils::GridAtlas;
 
-mod grid_edge_set;
-pub use crate::grid_edge_set::GridEdgeAtlas;
-
-
+mod grids;

@@ -1,6 +1,6 @@
-use std::path::Path;
 use image::{ImageResult, RgbaImage};
-use tileset::{GridAtlas, TailCornerAtlas, GridEdgeAtlas, GridCornerAtlas};
+use std::path::Path;
+use tileset::{GridAtlas, GridCornerAtlas, GridEdgeAtlas};
 
 #[test]
 fn ready() {
@@ -15,7 +15,10 @@ fn test_atlas() {
     debug_corner(&here.join("tests/atlas3"), |image| GridCornerAtlas::from_wang(image)).unwrap();
 }
 
-pub fn debug_corner<F>(root: &Path, loader: F) -> ImageResult<()> where F: Fn(&RgbaImage) -> ImageResult<GridCornerAtlas> {
+pub fn debug_corner<F>(root: &Path, loader: F) -> ImageResult<()>
+where
+    F: Fn(&RgbaImage) -> ImageResult<GridCornerAtlas>,
+{
     let image = image::open(root.join("atlas.png"))?.to_rgba8();
     let atlas = loader(&image)?;
     atlas.save(root.join("atlas-std.png"))?;

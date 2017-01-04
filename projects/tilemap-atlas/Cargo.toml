@@ -1,6 +1,6 @@
 [package]
 name = "tileset"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Aster <192607617@qq.com>"]
 description = "Tailset definition, and supports importing multiple formats"
 repository = "https://github.com/oovm/Tilemap"
@@ -10,6 +10,8 @@ license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
+dashmap = "5.4.0"
+ndarray = "0.15.6"
 rand_core = "0.6.4"
 image = "0.24.6"
 serde = { version = "1.0.160", optional = true }

@@ -1,15 +1,20 @@
-use image::error::{LimitError, LimitErrorKind};
-use image::{ImageError, ImageResult, RgbaImage, SubImage};
+use image::{
+    error::{LimitError, LimitErrorKind},
+    ImageError, ImageResult, RgbaImage, SubImage,
+};
 
 use rand_core::RngCore;
 
-
+pub trait TilesProvider {}
 pub trait GridAtlas {
     fn cell_size(&self) -> u32;
     fn get_cell(&self, a: bool, b: bool, c: bool, d: bool, n: u32) -> SubImage<&RgbaImage>;
     /// Get a tile by side relation mask.
     #[inline]
-    fn get_side_random<R>(&self, a: bool, b: bool, c: bool, d: bool, rng: &mut R) -> SubImage<&RgbaImage> where R: RngCore {
+    fn get_side_random<R>(&self, a: bool, b: bool, c: bool, d: bool, rng: &mut R) -> SubImage<&RgbaImage>
+    where
+        R: RngCore,
+    {
         self.get_cell(a, b, c, d, rng.next_u32())
     }
 }
@@ -31,4 +36,3 @@ pub fn check_wang4x4(wang: &RgbaImage) -> ImageResult<u32> {
     }
     Ok(cell_size)
 }
-

@@ -3,7 +3,7 @@
 mod utils;
 pub use crate::{
     grids::{bg_set::GridBackgroundAtlas, corner_set::GridCornerAtlas, grid_edge_set::GridEdgeAtlas},
-    utils::GridAtlas,
+    utils::{GridAtlas, TilesProvider},
 };
 pub use image::{RgbaImage, SubImage};
 

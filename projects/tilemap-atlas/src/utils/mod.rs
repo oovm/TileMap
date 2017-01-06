@@ -6,6 +6,7 @@ use image::{
 use rand_core::RngCore;
 
 pub trait TilesProvider {}
+
 pub trait GridAtlas {
     fn cell_size(&self) -> u32;
     fn get_cell(&self, a: bool, b: bool, c: bool, d: bool, n: u32) -> SubImage<&RgbaImage>;

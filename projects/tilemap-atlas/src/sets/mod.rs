@@ -1,11 +1,10 @@
 use crate::TilesProvider;
 use dashmap::DashMap;
-use fs::create_dir_all;
-use image::{ImageError, ImageResult};
+use image::{GenericImageView, ImageError, ImageResult};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs,
+    fs::create_dir_all,
     io::{Error, ErrorKind},
     path::{Path, PathBuf},
 };
@@ -56,8 +55,8 @@ impl FileSystemTiles {
         Ok(())
     }
     fn write_json(&self) -> ImageResult<()> {
-        let json = serde_json5::to_string(&self).unwrap();
-        std::fs::write(self.workspace.join("TileSet.json5"), json).unwrap();
+        let json = serde_json::to_string_pretty(self).unwrap();
+        std::fs::write(self.workspace.join("TileSet.json5"), json)?;
         Ok(())
     }
 
@@ -65,7 +64,15 @@ impl FileSystemTiles {
     where
         S: AsRef<Path>,
     {
-        todo!()
+        let path = workspace.as_ref().join("TileSet.json5");
+        let json = std::fs::read_to_string(&path)?;
+        match serde_json::from_str(&json) {
+            Ok(out) => Ok(out),
+            Err(e) => Err(ImageError::IoError(Error::new(
+                ErrorKind::InvalidInput,
+                format!("The file {:?} is not a valid TileSet.json5 file: {}", json, e),
+            ))),
+        }
     }
     pub fn set_cell_size(&mut self, size: usize) {
         assert_ne!(size, 0, "The size of the atlas must be greater than zero");
@@ -74,6 +81,30 @@ impl FileSystemTiles {
     pub fn get_cell_size(&self) -> u32 {
         self.size
     }
+    pub fn insert_atlas(&mut self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
+        let name = Path::new(file_name).file_stem().and_then(|s| s.to_str()).filter(|s| !s.is_empty());
+        let name = match name {
+            Some(name) => name.to_string(),
+            None => {
+                return Err(ImageError::IoError(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("The file {:?} is not a valid image file", file_name),
+                )));
+            }
+        };
+        let path = self.workspace.join(file_name);
+        let image = image::open(&path)?;
+        let atlas = TileAtlas { kind, size: image.width() };
+        self.atlas.insert(name.clone(), atlas);
+        Ok(name)
+    }
+}
+
+pub fn io_error<T, S>(message: S, kind: ErrorKind) -> ImageResult<T>
+where
+    S: ToString,
+{
+    Err(ImageError::IoError(Error::new(kind, message.to_string())))
 }
 
 #[derive(Clone, Debug, Default)]

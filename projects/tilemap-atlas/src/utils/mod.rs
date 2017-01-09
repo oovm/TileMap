@@ -2,6 +2,7 @@ use image::{
     error::{LimitError, LimitErrorKind},
     ImageError, ImageResult, RgbaImage, SubImage,
 };
+use std::io::{Error, ErrorKind};
 
 use rand_core::RngCore;
 
@@ -22,6 +23,13 @@ pub trait GridAtlas {
 
 pub fn dimension_error<T>() -> ImageResult<T> {
     Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))
+}
+
+pub fn io_error<T, S>(message: S, kind: ErrorKind) -> ImageResult<T>
+where
+    S: ToString,
+{
+    Err(ImageError::IoError(Error::new(kind, message.to_string())))
 }
 
 pub fn check_width_divide_by_16(image: &RgbaImage) {

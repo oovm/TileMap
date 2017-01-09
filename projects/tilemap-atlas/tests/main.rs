@@ -1,6 +1,6 @@
 use image::{ImageResult, RgbaImage};
 use std::path::Path;
-use tileset::{FileSystemTiles, GridAtlas, GridCornerAtlas, GridEdgeAtlas};
+use tileset::{FileSystemTiles, GridAtlas, GridCornerAtlas, GridEdgeAtlas, TileAtlasKind};
 
 #[test]
 fn ready() {
@@ -58,5 +58,6 @@ pub fn debug_edge_from_wang(root: &Path) -> ImageResult<()> {
 
 #[test]
 fn test_fs() {
-    let pvd = FileSystemTiles::new("assets/tile-set-1/", 32).unwrap();
+    let mut pvd = FileSystemTiles::new("assets/tile-set-1/", 32).unwrap();
+    pvd.insert_atlas("atlas.png", TileAtlasKind::GridCornerWang).unwrap();
 }

@@ -10,4 +10,4 @@ pub use image::{RgbaImage, SubImage};
 mod grids;
 mod sets;
 
-pub use sets::{AtlasReference, FileSystemTiles};
+pub use sets::{FileSystemTiles, TileAtlasKind};

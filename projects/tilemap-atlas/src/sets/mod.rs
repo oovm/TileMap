@@ -1,31 +1,21 @@
-use crate::TilesProvider;
+use crate::{utils::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
 use dashmap::DashMap;
 use image::{GenericImageView, ImageError, ImageResult};
 use serde::{Deserialize, Serialize};
+use serde_json::{ser::PrettyFormatter, Serializer};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs::create_dir_all,
+    fs::{create_dir_all, File},
     io::{Error, ErrorKind},
     path::{Path, PathBuf},
 };
 
-#[derive(Clone, Debug, Default)]
-pub struct AtlasSets<G> {
-    atlas: DashMap<String, G>,
-    palette: DashMap<(u32, u32), AtlasReference>,
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct AtlasReference {
-    name: String,
-    index: usize,
-    variant: usize,
-}
+mod der;
+mod ser;
 
 impl TilesProvider for FileSystemTiles {}
 
 #[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FileSystemTiles {
     workspace: PathBuf,
     size: u32,
@@ -44,22 +34,24 @@ impl FileSystemTiles {
         Ok(out)
     }
     fn ensure_path(&mut self) -> ImageResult<()> {
-        create_dir_all(&self.workspace).unwrap();
+        create_dir_all(&self.workspace)?;
         self.workspace = self.workspace.canonicalize()?;
         if !self.workspace.is_dir() {
-            return Err(ImageError::IoError(Error::new(
-                ErrorKind::InvalidInput,
-                format!("The path {:?} is not a directory", self.workspace.display()),
-            )));
+            io_error(format!("The path {:?} is not a directory", self.workspace.display()), ErrorKind::InvalidInput)?
         }
         Ok(())
     }
     fn write_json(&self) -> ImageResult<()> {
-        let json = serde_json::to_string_pretty(self).unwrap();
-        std::fs::write(self.workspace.join("TileSet.json5"), json)?;
-        Ok(())
+        let path = File::create(self.workspace.join("TileSet.json5"))?;
+        let mut pretty = Serializer::with_formatter(path, PrettyFormatter::with_indent(b"    "));
+        match self.serialize(&mut pretty) {
+            Ok(_) => Ok(()),
+            Err(e) => io_error(
+                format!("The file {:?} is not a valid TileSet.json5 file: {}", self.workspace.display(), e),
+                ErrorKind::InvalidInput,
+            ),
+        }
     }
-
     pub fn load<S>(workspace: S) -> ImageResult<Self>
     where
         S: AsRef<Path>,
@@ -68,10 +60,9 @@ impl FileSystemTiles {
         let json = std::fs::read_to_string(&path)?;
         match serde_json::from_str(&json) {
             Ok(out) => Ok(out),
-            Err(e) => Err(ImageError::IoError(Error::new(
-                ErrorKind::InvalidInput,
-                format!("The file {:?} is not a valid TileSet.json5 file: {}", json, e),
-            ))),
+            Err(e) => {
+                io_error(format!("The file {:?} is not a valid TileSet.json5 file: {}", json, e), ErrorKind::InvalidInput)
+            }
         }
     }
     pub fn set_cell_size(&mut self, size: usize) {
@@ -85,33 +76,20 @@ impl FileSystemTiles {
         let name = Path::new(file_name).file_stem().and_then(|s| s.to_str()).filter(|s| !s.is_empty());
         let name = match name {
             Some(name) => name.to_string(),
-            None => {
-                return Err(ImageError::IoError(Error::new(
-                    ErrorKind::InvalidInput,
-                    format!("The file {:?} is not a valid image file", file_name),
-                )));
-            }
+            None => io_error(format!("The file {:?} is not a valid image file", file_name), ErrorKind::InvalidInput)?,
         };
-        let path = self.workspace.join(file_name);
-        let image = image::open(&path)?;
-        let atlas = TileAtlas { kind, size: image.width() };
+        let atlas = TileAtlas::new(&self.workspace.join(file_name), kind)?;
         self.atlas.insert(name.clone(), atlas);
+        self.write_json()?;
         Ok(name)
     }
-}
-
-pub fn io_error<T, S>(message: S, kind: ErrorKind) -> ImageResult<T>
-where
-    S: ToString,
-{
-    Err(ImageError::IoError(Error::new(kind, message.to_string())))
 }
 
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TileAtlas {
     kind: TileAtlasKind,
-    size: u32,
+    cell_size: u32,
 }
 
 #[derive(Clone, Debug)]
@@ -127,5 +105,31 @@ pub enum TileAtlasKind {
 impl Default for TileAtlasKind {
     fn default() -> Self {
         Self::GridCorner
+    }
+}
+
+impl TileAtlas {
+    pub fn new(path: &Path, kind: TileAtlasKind) -> ImageResult<Self> {
+        let image = image::open(&path)?.to_rgba8();
+        let mut size = 0;
+        match kind {
+            TileAtlasKind::GridCorner => {
+                todo!()
+            }
+            TileAtlasKind::GridCornerWang => {
+                let wang = GridCornerAtlas::from_wang(&image)?;
+                size = wang.cell_size();
+            }
+            TileAtlasKind::GridRMXP => {
+                todo!()
+            }
+            TileAtlasKind::GridEdge => {
+                todo!()
+            }
+            TileAtlasKind::GridEdgeWang => {
+                todo!()
+            }
+        }
+        Ok(Self { kind, cell_size: size })
     }
 }

@@ -25,4 +25,4 @@ features = []
 
 [features]
 default = ["serde"]
-serde = ["ndarray/serde", "tileset/serde"]
+serde = ["ndarray/serde"]

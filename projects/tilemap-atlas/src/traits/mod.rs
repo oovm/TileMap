@@ -6,6 +6,7 @@ use std::io::{Error, ErrorKind};
 
 use rand_core::RngCore;
 
+/// A manager that can dynamically determine the required tiles.
 pub trait TilesProvider {}
 
 pub trait GridAtlas {

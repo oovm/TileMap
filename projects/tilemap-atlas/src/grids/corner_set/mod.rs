@@ -1,14 +1,11 @@
-use image::{GenericImageView, RgbaImage, SubImage};
-use crate::GridAtlas;
-use crate::utils::check_width_divide_by_16;
+use crate::{traits::check_width_divide_by_16, GridAtlas};
+use image::{GenericImageView, ImageResult, RgbaImage, SubImage};
 use std::path::Path;
-use image::ImageResult;
 
 mod ser;
 
 mod der;
 mod display;
-
 
 /// A tile atlas for gridded maps
 ///
@@ -38,27 +35,18 @@ pub struct GridCornerAtlas {
 
 impl Default for GridCornerAtlas {
     fn default() -> Self {
-        Self {
-            image: RgbaImage::new(16, 1),
-            count: [1; 16],
-        }
+        Self { image: RgbaImage::new(16, 1), count: [1; 16] }
     }
 }
 
 impl GridCornerAtlas {
     pub fn new(image: RgbaImage, count: [u8; 16]) -> Self {
         check_width_divide_by_16(&image);
-        Self {
-            image,
-            count,
-        }
+        Self { image, count }
     }
     /// Create a grid corner atlas without check
     pub unsafe fn create(image: RgbaImage, count: [u8; 16]) -> Self {
-        Self {
-            image,
-            count,
-        }
+        Self { image, count }
     }
 }
 
@@ -71,10 +59,7 @@ impl GridAtlas for GridCornerAtlas {
         let s = self.cell_size();
         let i = ((lu as u8) | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3) as u32;
         // SAFETY: index must be in range
-        let j = n % unsafe {
-            *self.count.get_unchecked(i as usize) as u32
-        };
+        let j = n % unsafe { *self.count.get_unchecked(i as usize) as u32 };
         self.image.view(i * s, j * s, s, s)
     }
 }
-

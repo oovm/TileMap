@@ -1,12 +1,13 @@
-use crate::{utils::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
+use crate::{traits::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
+
 use dashmap::DashMap;
-use image::{GenericImageView, ImageError, ImageResult};
+use image::ImageResult;
 use serde::{Deserialize, Serialize};
 use serde_json::{ser::PrettyFormatter, Serializer};
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeMap,
     fs::{create_dir_all, File},
-    io::{Error, ErrorKind},
+    io::ErrorKind,
     path::{Path, PathBuf},
 };
 
@@ -19,7 +20,7 @@ impl TilesProvider for FileSystemTiles {}
 pub struct FileSystemTiles {
     workspace: PathBuf,
     size: u32,
-    atlas: BTreeMap<String, TileAtlas>,
+    atlas: DashMap<String, TileAtlas>,
 }
 
 impl FileSystemTiles {
@@ -28,7 +29,7 @@ impl FileSystemTiles {
         S: AsRef<Path>,
     {
         assert_ne!(size, 0, "The size of the atlas must be greater than zero");
-        let mut out = Self { workspace: PathBuf::from(workspace.as_ref()), size: size as u32, atlas: BTreeMap::new() };
+        let mut out = Self { workspace: PathBuf::from(workspace.as_ref()), size: size as u32, atlas: DashMap::new() };
         out.ensure_path()?;
         out.write_json()?;
         Ok(out)
@@ -52,42 +53,42 @@ impl FileSystemTiles {
             ),
         }
     }
-    pub fn load<S>(workspace: S) -> ImageResult<Self>
-    where
-        S: AsRef<Path>,
-    {
-        let path = workspace.as_ref().join("TileSet.json5");
-        let json = std::fs::read_to_string(&path)?;
-        match serde_json::from_str(&json) {
-            Ok(out) => Ok(out),
-            Err(e) => {
-                io_error(format!("The file {:?} is not a valid TileSet.json5 file: {}", json, e), ErrorKind::InvalidInput)
-            }
-        }
-    }
-    pub fn set_cell_size(&mut self, size: usize) {
+
+    pub fn set_cell_size(&mut self, size: usize) -> ImageResult<()> {
         assert_ne!(size, 0, "The size of the atlas must be greater than zero");
         self.size = size as u32;
+        self.write_json()
     }
     pub fn get_cell_size(&self) -> u32 {
         self.size
     }
-    pub fn insert_atlas(&mut self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
+    pub fn insert_atlas(&self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
         let name = Path::new(file_name).file_stem().and_then(|s| s.to_str()).filter(|s| !s.is_empty());
         let name = match name {
             Some(name) => name.to_string(),
             None => io_error(format!("The file {:?} is not a valid image file", file_name), ErrorKind::InvalidInput)?,
         };
-        let atlas = TileAtlas::new(&self.workspace.join(file_name), kind)?;
+        let atlas = TileAtlas::new(&self.workspace.join(file_name), &name, kind)?;
         self.atlas.insert(name.clone(), atlas);
         self.write_json()?;
         Ok(name)
+    }
+    pub fn update_atlas(&self, name: &str) -> ImageResult<()> {
+        match self.atlas.get(name) {
+            Some(_) => {
+                todo!()
+            }
+            None => {
+                todo!()
+            }
+        }
     }
 }
 
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TileAtlas {
+    name: String,
     kind: TileAtlasKind,
     cell_size: u32,
 }
@@ -109,7 +110,7 @@ impl Default for TileAtlasKind {
 }
 
 impl TileAtlas {
-    pub fn new(path: &Path, kind: TileAtlasKind) -> ImageResult<Self> {
+    pub fn new(path: &Path, name: &str, kind: TileAtlasKind) -> ImageResult<Self> {
         let image = image::open(&path)?.to_rgba8();
         let mut size = 0;
         match kind {
@@ -130,6 +131,6 @@ impl TileAtlas {
                 todo!()
             }
         }
-        Ok(Self { kind, cell_size: size })
+        Ok(Self { name: name.to_string(), kind, cell_size: size })
     }
 }

@@ -1,5 +1,5 @@
 use super::*;
-use crate::utils::check_wang4x4;
+use crate::traits::check_wang4x4;
 use image::{GenericImage, ImageResult};
 use serde::{de::Visitor, Deserialize, Deserializer};
 use std::fmt::Formatter;

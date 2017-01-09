@@ -1,11 +1,9 @@
-use image::{GenericImageView, RgbaImage, SubImage};
-use crate::GridAtlas;
-use image::{GenericImage, ImageResult};
-use crate::utils::dimension_error;
+use crate::{traits::dimension_error, GridAtlas};
+use image::{GenericImage, GenericImageView, ImageResult, RgbaImage, SubImage};
 use std::path::Path;
 
-mod ser;
 mod der;
+mod ser;
 
 /// A edge tile atlas for gridded maps
 ///
@@ -37,17 +35,11 @@ impl GridEdgeAtlas {
         assert_eq!(image.width() % 16, 0, "image width {} does not divide by 16", image.width());
         let cell_size = image.width() / 16;
         assert_eq!(image.height() % cell_size, 0, "image height {} does not divide by cell size {}", image.height(), cell_size);
-        Self {
-            image,
-            count,
-        }
+        Self { image, count }
     }
     /// Create a grid edge atlas without check
     pub unsafe fn create(image: RgbaImage, count: [u8; 16]) -> Self {
-        Self {
-            image,
-            count,
-        }
+        Self { image, count }
     }
 }
 
@@ -60,9 +52,7 @@ impl GridAtlas for GridEdgeAtlas {
         let s = self.cell_size();
         let i = ((l as u8) | (u as u8) << 1 | (r as u8) << 2 | (d as u8) << 3) as u32;
         // SAFETY: index must be in range
-        let j = n % unsafe {
-            *self.count.get_unchecked(i as usize) as u32
-        };
+        let j = n % unsafe { *self.count.get_unchecked(i as usize) as u32 };
         self.image.view(i * s, j * s, s, s)
     }
 }

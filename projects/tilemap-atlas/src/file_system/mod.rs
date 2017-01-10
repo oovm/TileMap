@@ -3,7 +3,7 @@ use crate::{traits::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
 use dashmap::DashMap;
 use image::ImageResult;
 use serde::{Deserialize, Serialize};
-use serde_json::{ser::PrettyFormatter, Serializer};
+use serde_json::ser::PrettyFormatter;
 use std::{
     collections::BTreeMap,
     fs::{create_dir_all, File},
@@ -48,7 +48,7 @@ impl FileSystemTiles {
     }
     fn write_json(&self) -> ImageResult<()> {
         let path = File::create(self.workspace.join("TileSet.json5"))?;
-        let mut pretty = Serializer::with_formatter(path, PrettyFormatter::with_indent(b"    "));
+        let mut pretty = serde_json::Serializer::with_formatter(path, PrettyFormatter::with_indent(b"    "));
         match self.serialize(&mut pretty) {
             Ok(_) => Ok(()),
             Err(e) => io_error(
@@ -65,6 +65,15 @@ impl FileSystemTiles {
     }
     pub fn get_cell_size(&self) -> u32 {
         self.size
+    }
+    pub fn get_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+        self.atlas.get(name).map(|a| a.value().clone())
+    }
+    pub fn get_corner_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+        self.atlas.get(name).map(|a| a.value().clone())
+    }
+    pub fn get_side_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+        self.atlas.get(name).map(|a| a.value().clone())
     }
     pub fn insert_atlas(&self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
         let name = Path::new(file_name).file_stem().and_then(|s| s.to_str()).filter(|s| !s.is_empty());
@@ -96,9 +105,42 @@ pub struct TileAtlas {
     name: String,
     /// Relative path to the file
     file: String,
-    kind: TileAtlasKind,
     /// Size of the cell in pixels
-    cell_size: u32,
+    cell_w: u32,
+    cell_h: u32,
+    ///
+    custom: TileAtlasData,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[serde(tag = "type")]
+pub enum TileAtlasData {
+    SimpleSet {
+        /// The number of horizontal sprites
+        columns: usize,
+        /// The number of vertical sprites
+        rows: usize,
+        /// The number of sprites
+        count: usize,
+    },
+    Animation {
+        /// The number of horizontal sprites
+        columns: usize,
+        /// The number of vertical sprites
+        rows: usize,
+        /// The number of sprites
+        count: usize,
+    },
+    GridCorner {
+        w: usize,
+        h: usize,
+        mask: u8,
+    },
+    GridCornerWang,
+    GridRpgMakerXP,
+    GridEdge,
+    GridEdgeWang,
 }
 
 #[derive(Clone, Debug)]
@@ -106,9 +148,15 @@ pub struct TileAtlas {
 pub enum TileAtlasKind {
     GridCorner,
     GridCornerWang,
-    GridRMXP,
+    GridRpgMakerXP,
     GridEdge,
     GridEdgeWang,
+}
+
+impl Default for TileAtlasData {
+    fn default() -> Self {
+        Self::SimpleSet { columns: 1, rows: 1, count: 1 }
+    }
 }
 
 impl Default for TileAtlasKind {
@@ -125,11 +173,11 @@ impl TileAtlas {
             TileAtlasKind::GridCorner => {
                 todo!()
             }
-            TileAtlasKind::GridCornerWang(_) => {
+            TileAtlasKind::GridCornerWang => {
                 let wang = GridCornerAtlas::from_wang(&image)?;
                 size = wang.cell_size();
             }
-            TileAtlasKind::GridRMXP => {
+            TileAtlasKind::GridRpgMakerXP => {
                 todo!()
             }
             TileAtlasKind::GridEdge => {
@@ -139,6 +187,6 @@ impl TileAtlas {
                 todo!()
             }
         }
-        Ok(Self { name: name.to_string(), file: name.to_string(), kind, cell_size: size })
+        Ok(Self { name: name.to_string(), file: name.to_string(), cell_w: 32, cell_h: 32, custom: Default::default() })
     }
 }

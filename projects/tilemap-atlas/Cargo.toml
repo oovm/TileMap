@@ -10,16 +10,17 @@ license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
+itertools = "0.10.5"
 dashmap = "5.4.0"
 ndarray = "0.15.6"
 rand_core = "0.6.4"
 image = "0.24.6"
-serde = { version = "1.0.160", features = ["serde_derive"] }
-serde_json = { version = "1.0.96" }
+serde = { version = "1.0.160", features = ["serde_derive"], optional = true  }
+serde_json = { version = "1.0.96", optional = true  }
 rc-zip = { version = "2.0.1", optional = true }
 
 [dev-dependencies]
 
 [features]
-default = []
-
+default = ["serde"]
+serde = ["dep:serde", "serde_json"]

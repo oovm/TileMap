@@ -14,6 +14,10 @@ use std::{
 mod der;
 mod ser;
 
+mod grids;
+
+pub use self::grids::corner_wang::GridCornerWang;
+
 impl TilesProvider for FileSystemTiles {}
 
 #[derive(Clone, Debug, Default)]
@@ -88,8 +92,12 @@ impl FileSystemTiles {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TileAtlas {
+    /// Tile atlas name
     name: String,
+    /// Relative path to the file
+    file: String,
     kind: TileAtlasKind,
+    /// Size of the cell in pixels
     cell_size: u32,
 }
 
@@ -117,7 +125,7 @@ impl TileAtlas {
             TileAtlasKind::GridCorner => {
                 todo!()
             }
-            TileAtlasKind::GridCornerWang => {
+            TileAtlasKind::GridCornerWang(_) => {
                 let wang = GridCornerAtlas::from_wang(&image)?;
                 size = wang.cell_size();
             }
@@ -131,6 +139,6 @@ impl TileAtlas {
                 todo!()
             }
         }
-        Ok(Self { name: name.to_string(), kind, cell_size: size })
+        Ok(Self { name: name.to_string(), file: name.to_string(), kind, cell_size: size })
     }
 }

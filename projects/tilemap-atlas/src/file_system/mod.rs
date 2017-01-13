@@ -1,7 +1,7 @@
 use crate::{traits::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
 
 use dashmap::DashMap;
-use image::ImageResult;
+use image::{ImageResult, RgbaImage};
 use serde::{Deserialize, Serialize};
 use serde_json::ser::PrettyFormatter;
 use std::{
@@ -20,32 +20,22 @@ pub use self::grids::corner_wang::GridCornerWang;
 
 impl TilesProvider for FileSystemTiles {}
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct FileSystemTiles {
     workspace: PathBuf,
-    size: u32,
+    size_w: u32,
+    size_h: u32,
     atlas: DashMap<String, TileAtlas>,
+    cache: DashMap<String, RgbaImage>,
+}
+
+impl Default for FileSystemTiles {
+    fn default() -> Self {
+        Self { workspace: Default::default(), size_w: 32, size_h: 32, atlas: Default::default(), cache: Default::default() }
+    }
 }
 
 impl FileSystemTiles {
-    pub fn new<S>(workspace: S, size: usize) -> ImageResult<Self>
-    where
-        S: AsRef<Path>,
-    {
-        assert_ne!(size, 0, "The size of the atlas must be greater than zero");
-        let mut out = Self { workspace: PathBuf::from(workspace.as_ref()), size: size as u32, atlas: DashMap::new() };
-        out.ensure_path()?;
-        out.write_json()?;
-        Ok(out)
-    }
-    fn ensure_path(&mut self) -> ImageResult<()> {
-        create_dir_all(&self.workspace)?;
-        self.workspace = self.workspace.canonicalize()?;
-        if !self.workspace.is_dir() {
-            io_error(format!("The path {:?} is not a directory", self.workspace.display()), ErrorKind::InvalidInput)?
-        }
-        Ok(())
-    }
     fn write_json(&self) -> ImageResult<()> {
         let path = File::create(self.workspace.join("TileSet.json5"))?;
         let mut pretty = serde_json::Serializer::with_formatter(path, PrettyFormatter::with_indent(b"    "));
@@ -60,11 +50,11 @@ impl FileSystemTiles {
 
     pub fn set_cell_size(&mut self, size: usize) -> ImageResult<()> {
         assert_ne!(size, 0, "The size of the atlas must be greater than zero");
-        self.size = size as u32;
+        self.size_w = size as u32;
         self.write_json()
     }
     pub fn get_cell_size(&self) -> u32 {
-        self.size
+        self.size_w
     }
     pub fn get_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
         self.atlas.get(name).map(|a| a.value().clone())

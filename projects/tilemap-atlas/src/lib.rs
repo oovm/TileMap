@@ -9,5 +9,6 @@ pub use image::{RgbaImage, SubImage};
 
 mod file_system;
 mod grids;
+pub mod utils;
 
 pub use crate::file_system::{FileSystemTiles, TileAtlasKind};

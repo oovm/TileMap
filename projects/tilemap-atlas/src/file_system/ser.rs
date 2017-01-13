@@ -9,7 +9,7 @@ impl Serialize for FileSystemTiles {
     {
         let items = self.atlas.iter().sorted_unstable_by(|a, b| a.name.cmp(&b.name)).map(|m| m.clone()).collect::<Vec<_>>();
         let mut state = serializer.serialize_struct("FileSystemTiles", 3)?;
-        state.serialize_field("size", &self.size)?;
+        state.serialize_field("size", &self.size_w)?;
         state.serialize_field("atlas", &items)?;
         state.end()
     }

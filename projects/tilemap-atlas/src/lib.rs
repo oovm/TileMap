@@ -7,8 +7,12 @@ pub use crate::{
 };
 pub use image::{RgbaImage, SubImage};
 
+mod animations;
 mod file_system;
 mod grids;
 pub mod utils;
 
-pub use crate::file_system::{FileSystemTiles, TileAtlasKind};
+pub use crate::{
+    animations::standard::AnimationFrame,
+    file_system::{FileSystemTiles, TileAtlasData, TileAtlasKind},
+};

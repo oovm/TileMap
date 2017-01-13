@@ -1,4 +1,4 @@
-use crate::{traits::io_error, GridAtlas, GridCornerAtlas, TilesProvider};
+use crate::{traits::io_error, AnimationFrame, GridAtlas, GridCornerAtlas, TilesProvider};
 
 use dashmap::DashMap;
 use image::{ImageResult, RgbaImage};
@@ -14,9 +14,8 @@ use std::{
 mod der;
 mod ser;
 
-mod grids;
-
-pub use self::grids::corner_wang::GridCornerWang;
+pub mod animations;
+pub mod grids;
 
 impl TilesProvider for FileSystemTiles {}
 
@@ -114,14 +113,7 @@ pub enum TileAtlasData {
         /// The number of sprites
         count: usize,
     },
-    Animation {
-        /// The number of horizontal sprites
-        columns: usize,
-        /// The number of vertical sprites
-        rows: usize,
-        /// The number of sprites
-        count: usize,
-    },
+    Animation(Box<AnimationFrame>),
     GridCorner {
         w: usize,
         h: usize,

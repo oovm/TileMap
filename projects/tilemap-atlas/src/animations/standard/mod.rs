@@ -1,4 +1,5 @@
 use super::*;
+use std::path::PathBuf;
 
 /// Combining multiple sequence frame sprites into one animation frame sprites
 ///
@@ -13,7 +14,7 @@ use super::*;
 /// # Examples
 ///
 /// ```
-/// # use tilemap_atlas::utils::AnimationFrame;
+/// # use tileset::AnimationFrame;
 /// ```
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -42,7 +43,7 @@ impl AnimationFrame {
     /// # Examples
     ///
     /// ```
-    /// # use tilemap_atlas::utils::AnimationFrame;
+    /// # use tileset::AnimationFrame;
     /// ```
     pub fn composite_sequence_frames<P, S>(folder: P, names: &[S], target: &str) -> ImageResult<AnimationFrame>
     where
@@ -61,5 +62,28 @@ impl AnimationFrame {
         let file_name = format!("{}.png", target);
         output.save(folder.join(&file_name))?;
         Ok(AnimationFrame { cell_w, cell_h, frames: names.len(), key: file_name })
+    }
+}
+
+impl AnimationFrame {
+    /// Combining multiple sequence frame sprites into one animation frame sprites
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::AnimationFrame;
+    /// ```
+    pub fn get_key(&self) -> &str {
+        &self.key
+    }
+    /// Get the image path if it is a disk image
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::AnimationFrame;
+    /// ```
+    pub fn get_path(&self, root: &Path) -> PathBuf {
+        root.join(&self.key)
     }
 }

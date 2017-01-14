@@ -15,4 +15,5 @@ pub mod utils;
 pub use crate::{
     animations::standard::AnimationFrame,
     file_system::{FileSystemTiles, TileAtlasData, TileAtlasKind},
+    grids::corner_wang::GridCornerWang,
 };

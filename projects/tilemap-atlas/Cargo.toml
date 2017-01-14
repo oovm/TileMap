@@ -1,6 +1,6 @@
 [package]
 name = "tileset"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["Aster <192607617@qq.com>"]
 description = "Tailset definition, and supports importing multiple formats"
 repository = "https://github.com/oovm/Tilemap"

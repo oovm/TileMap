@@ -1,11 +1,10 @@
-use crate::{traits::io_error, AnimationFrame, GridAtlas, GridCornerAtlas, GridCornerOwned, GridCornerWang, TilesProvider};
+use crate::{traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerWang, TilesProvider};
 
 use dashmap::DashMap;
 use image::{ImageResult, RgbaImage};
 use serde::{Deserialize, Serialize};
 use serde_json::ser::PrettyFormatter;
 use std::{
-    collections::BTreeMap,
     fs::{create_dir_all, File},
     io::ErrorKind,
     path::{Path, PathBuf},
@@ -55,13 +54,13 @@ impl FileSystemTiles {
     pub fn get_cell_size(&self) -> u32 {
         self.size_w
     }
-    pub fn get_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+    pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_corner_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+    pub fn get_corner_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_side_atlas(&self, name: &str, mask: u8) -> Option<TileAtlas> {
+    pub fn get_side_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
     pub fn insert_atlas(&self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
@@ -145,8 +144,8 @@ impl Default for TileAtlasKind {
 
 impl TileAtlas {
     pub fn new(path: &Path, name: &str, kind: TileAtlasKind) -> ImageResult<Self> {
-        let image = image::open(&path)?.to_rgba8();
-        let mut size = 0;
+        let _image = image::open(&path)?.to_rgba8();
+        let _size = 0;
         match kind {
             TileAtlasKind::GridCorner => {
                 todo!()

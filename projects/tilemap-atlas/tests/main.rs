@@ -58,6 +58,6 @@ pub fn debug_edge_from_wang(root: &Path) -> ImageResult<()> {
 
 #[test]
 fn test_fs() {
-    let mut pvd = FileSystemTiles::new("assets/tile-set-1/", 32, 32).unwrap();
+    let pvd = FileSystemTiles::new("assets/tile-set-1/", 32, 32).unwrap();
     pvd.insert_atlas("atlas.png", TileAtlasKind::GridCornerWang).unwrap();
 }

@@ -3,7 +3,6 @@ use super::*;
 mod ser;
 
 mod der;
-mod display;
 
 /// A tile atlas for gridded maps
 ///

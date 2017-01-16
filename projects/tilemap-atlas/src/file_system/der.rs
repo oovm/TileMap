@@ -3,7 +3,7 @@ use serde::{
     de::{MapAccess, Visitor},
     Deserializer,
 };
-use serde_json::Error;
+
 use std::fmt::Formatter;
 
 impl FileSystemTiles {

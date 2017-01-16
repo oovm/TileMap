@@ -1,8 +1,6 @@
-
 // use serde::ser::SerializeStruct;
 // use serde::Serialize;
 use super::*;
-
 
 // impl Serialize for TailCornerAtlas {
 //     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
@@ -14,10 +12,11 @@ use super::*;
 //     }
 // }
 
-impl GridCornerAtlas {
-    pub fn save<P>(&self, path: P) -> ImageResult<()> where P: AsRef<Path> {
+impl GridCornerOwned {
+    pub fn save<P>(&self, path: P) -> ImageResult<()>
+    where
+        P: AsRef<Path>,
+    {
         self.image.save(path)
     }
 }
-
-

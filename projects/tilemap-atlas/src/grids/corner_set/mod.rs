@@ -1,6 +1,4 @@
-use crate::{traits::check_width_divide_by_16, GridAtlas};
-use image::{GenericImageView, ImageResult, RgbaImage, SubImage};
-use std::path::Path;
+use super::*;
 
 mod ser;
 
@@ -28,18 +26,27 @@ mod display;
 /// cell.save("side-1011.png").unwrap();
 /// ```
 #[derive(Clone, Debug)]
-pub struct GridCornerAtlas {
+pub struct GridCornerOwned {
     image: RgbaImage,
     count: [u8; 16],
 }
 
-impl Default for GridCornerAtlas {
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct GridCornerAtlas {
+    pub(crate) key: String,
+    pub(crate) cell_w: u32,
+    pub(crate) cell_h: u32,
+    pub(crate) count: [u32; 16],
+}
+
+impl Default for GridCornerOwned {
     fn default() -> Self {
         Self { image: RgbaImage::new(16, 1), count: [1; 16] }
     }
 }
 
-impl GridCornerAtlas {
+impl GridCornerOwned {
     pub fn new(image: RgbaImage, count: [u8; 16]) -> Self {
         check_width_divide_by_16(&image);
         Self { image, count }
@@ -50,7 +57,7 @@ impl GridCornerAtlas {
     }
 }
 
-impl GridAtlas for GridCornerAtlas {
+impl GridAtlas for GridCornerOwned {
     fn cell_size(&self) -> u32 {
         self.image.width() / 16
     }

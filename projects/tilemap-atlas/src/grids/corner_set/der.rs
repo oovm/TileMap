@@ -1,12 +1,11 @@
 use super::*;
-use crate::traits::check_wang4x4;
 use image::{GenericImage, ImageResult};
 use serde::{de::Visitor, Deserialize, Deserializer};
 use std::fmt::Formatter;
 
 struct VisitorGridAtlas;
 
-impl<'de> Deserialize<'de> for GridCornerAtlas {
+impl<'de> Deserialize<'de> for GridCornerOwned {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -16,67 +15,14 @@ impl<'de> Deserialize<'de> for GridCornerAtlas {
 }
 
 impl<'de> Visitor<'de> for VisitorGridAtlas {
-    type Value = GridCornerAtlas;
+    type Value = GridCornerOwned;
 
     fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
         formatter.write_str("except TileAtlas4x6 {width, height, image}")
     }
 }
 
-impl GridCornerAtlas {
-    /// A 4*4
-    pub fn from_wang(wang: &RgbaImage) -> ImageResult<Self> {
-        let cell_size = check_wang4x4(wang)?;
-        let mut out = Self { image: RgbaImage::new(cell_size * 16, cell_size), count: [1; 16] };
-        for i in 0..16 {
-            let view = make_wing_cell(wang, i, cell_size);
-            out.image.copy_from(&view.to_image(), i * cell_size, 0)?;
-        }
-        Ok(out)
-    }
-}
-
-/// ```js
-/// 0b0000 <- 0  <- (1, 4)
-/// 0b0001 <- 8  <- (4, 4)
-/// 0b0010 <- 1  <- (1, 3)
-/// 0b0011 <- 9  <- (2, 3)
-/// 0b0100 <- 4  <- (1, 1)
-/// 0b0101 <- 12 <- (4, 3)
-/// 0b0110 <- 5  <- (3, 4)
-/// 0b0111 <- 13 <- (4, 2)
-/// 0b1000 <- 2  <- (2, 3)
-/// 0b1001 <- 10 <- (1, 2)
-/// 0b1010 <- 3  <- (2, 1)
-/// 0b1011 <- 11 <- (3, 3)
-/// 0b1100 <- 6  <- (4, 1)
-/// 0b1101 <- 14 <- (3, 1)
-/// 0b1110 <- 7  <- (2, 2)
-/// 0b1111 <- 15 <- (3, 2)
-/// ```
-fn make_wing_cell(raw: &RgbaImage, id: u32, s: u32) -> SubImage<&RgbaImage> {
-    match id {
-        0b0000 => raw.view(0 * s, 3 * s, s, s),
-        0b0001 => raw.view(3 * s, 3 * s, s, s),
-        0b0010 => raw.view(0 * s, 2 * s, s, s),
-        0b0011 => raw.view(1 * s, 2 * s, s, s),
-        0b0100 => raw.view(0 * s, 0 * s, s, s),
-        0b0101 => raw.view(3 * s, 2 * s, s, s),
-        0b0110 => raw.view(2 * s, 3 * s, s, s),
-        0b0111 => raw.view(3 * s, 1 * s, s, s),
-        0b1000 => raw.view(1 * s, 3 * s, s, s),
-        0b1001 => raw.view(0 * s, 1 * s, s, s),
-        0b1010 => raw.view(1 * s, 0 * s, s, s),
-        0b1011 => raw.view(2 * s, 2 * s, s, s),
-        0b1100 => raw.view(3 * s, 0 * s, s, s),
-        0b1101 => raw.view(2 * s, 0 * s, s, s),
-        0b1110 => raw.view(1 * s, 1 * s, s, s),
-        0b1111 => raw.view(2 * s, 1 * s, s, s),
-        _ => unreachable!(),
-    }
-}
-
-impl GridCornerAtlas {
+impl GridCornerOwned {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics

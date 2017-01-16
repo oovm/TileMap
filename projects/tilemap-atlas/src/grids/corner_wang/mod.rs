@@ -1,6 +1,5 @@
 use super::*;
-use image::ImageResult;
-use std::path::{Path, PathBuf};
+use image::GenericImage;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -10,23 +9,7 @@ pub struct GridCornerWang {
     cell_h: u32,
 }
 
-// impl TileAtlas {
-//     pub(crate) fn load_grid_corner_wang(
-//         &self,
-//         root: &Path,
-//         target_size: u32,
-//         mask: u8,
-//         filter: FilterType,
-//     ) -> ImageResult<RgbaImage> {
-//         let image = image::open(root.join(&self.file))?.to_rgba8();
-//         let view = view_grid_corner_wang_cell(&image, mask);
-//         Ok(resize(&*view, target_size, target_size, filter))
-//     }
-//     pub(crate) fn norm_grid_corner_wang() {
-//         todo!()
-//     }
-// }
-
+// constructors
 impl GridCornerWang {
     pub fn new<S>(key: S, width: u32, height: u32) -> Self
     where
@@ -34,22 +17,87 @@ impl GridCornerWang {
     {
         Self { key: key.to_string(), cell_w: width, cell_h: height }
     }
+    pub fn as_standard<S, G>(&self, name: &str, image: &RgbaImage) -> ImageResult<(GridCornerAtlas, RgbaImage)>
+    where
+        S: ToString,
+        G: GenericImageView,
+    {
+        let mut output = RgbaImage::new(self.cell_w * 16, self.cell_h);
+        for i in 0..16 {
+            let view = view_grid_corner_wang_cell(image, i as u8);
+            output.copy_from(&*view, i * self.cell_w, 0)?;
+        }
+        Ok((GridCornerAtlas { key: name.to_string(), cell_w: self.cell_w, cell_h: self.cell_h, count: [1; 16] }, output))
+    }
 }
 
+// getters
 impl GridCornerWang {
+    /// Get Image
+    ///
+    /// # Arguments
+    ///
+    /// * `root`:
+    ///
+    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::GridCornerWang;
+    /// ```
     pub fn get_key(&self) -> &str {
         &self.key
     }
+    /// Get Image
+    ///
+    /// # Arguments
+    ///
+    /// * `root`:
+    ///
+    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::GridCornerWang;
+    /// ```
     pub fn get_path(&self, root: &Path) -> PathBuf {
         root.join(&self.key)
     }
+    /// Get Image
+    ///
+    /// # Arguments
+    ///
+    /// * `root`:
+    ///
+    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::GridCornerWang;
+    /// ```
     pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
         Ok(image::open(self.get_path(root))?.to_rgba8())
     }
-    pub fn get_corner(&self, root: &Path, mask: u8, target_size: u32, filter: FilterType) -> ImageResult<RgbaImage> {
+    /// Get Image
+    ///
+    /// # Arguments
+    ///
+    /// * `root`:
+    ///
+    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tileset::GridCornerWang;
+    /// ```
+    pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
+        let mask = ((lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3);
         let image = self.get_image(root)?;
-        let view = view_grid_corner_wang_cell(&image, mask);
-        Ok(resize(&*view, target_size, target_size, filter))
+        Ok(view_grid_corner_wang_cell(&image, mask).to_image())
     }
 }
 
@@ -81,24 +129,25 @@ impl GridCornerWang {
 /// 0b1111 <- 15 <- (3, 2)
 /// ```
 fn view_grid_corner_wang_cell(r: &RgbaImage, mask: u8) -> SubImage<&RgbaImage> {
-    let s = r.width() / 4;
+    let w = r.width() / 4;
+    let h = r.height() / 4;
     match mask {
-        0b0000 => r.view(0 * s, 3 * s, s, s),
-        0b0001 => r.view(3 * s, 3 * s, s, s),
-        0b0010 => r.view(0 * s, 2 * s, s, s),
-        0b0011 => r.view(1 * s, 2 * s, s, s),
-        0b0100 => r.view(0 * s, 0 * s, s, s),
-        0b0101 => r.view(3 * s, 2 * s, s, s),
-        0b0110 => r.view(2 * s, 3 * s, s, s),
-        0b0111 => r.view(3 * s, 1 * s, s, s),
-        0b1000 => r.view(1 * s, 3 * s, s, s),
-        0b1001 => r.view(0 * s, 1 * s, s, s),
-        0b1010 => r.view(1 * s, 0 * s, s, s),
-        0b1011 => r.view(2 * s, 2 * s, s, s),
-        0b1100 => r.view(3 * s, 0 * s, s, s),
-        0b1101 => r.view(2 * s, 0 * s, s, s),
-        0b1110 => r.view(1 * s, 1 * s, s, s),
-        0b1111 => r.view(2 * s, 1 * s, s, s),
+        0b0000 => r.view(0 * w, 3 * h, w, h),
+        0b0001 => r.view(3 * w, 3 * h, w, h),
+        0b0010 => r.view(0 * w, 2 * h, w, h),
+        0b0011 => r.view(1 * w, 2 * h, w, h),
+        0b0100 => r.view(0 * w, 0 * h, w, h),
+        0b0101 => r.view(3 * w, 2 * h, w, h),
+        0b0110 => r.view(2 * w, 3 * h, w, h),
+        0b0111 => r.view(3 * w, 1 * h, w, h),
+        0b1000 => r.view(1 * w, 3 * h, w, h),
+        0b1001 => r.view(0 * w, 1 * h, w, h),
+        0b1010 => r.view(1 * w, 0 * h, w, h),
+        0b1011 => r.view(2 * w, 2 * h, w, h),
+        0b1100 => r.view(3 * w, 0 * h, w, h),
+        0b1101 => r.view(2 * w, 0 * h, w, h),
+        0b1110 => r.view(1 * w, 1 * h, w, h),
+        0b1111 => r.view(2 * w, 1 * h, w, h),
         _ => unreachable!(),
     }
 }

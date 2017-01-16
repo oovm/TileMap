@@ -1,4 +1,4 @@
-use crate::{traits::io_error, AnimationFrame, GridAtlas, GridCornerAtlas, TilesProvider};
+use crate::{traits::io_error, AnimationFrame, GridAtlas, GridCornerAtlas, GridCornerOwned, GridCornerWang, TilesProvider};
 
 use dashmap::DashMap;
 use image::{ImageResult, RgbaImage};
@@ -114,12 +114,8 @@ pub enum TileAtlasData {
         count: usize,
     },
     Animation(Box<AnimationFrame>),
-    GridCorner {
-        w: usize,
-        h: usize,
-        mask: u8,
-    },
-    GridCornerWang,
+    GridCorner(Box<GridCornerAtlas>),
+    GridCornerWang(Box<GridCornerWang>),
     GridRpgMakerXP,
     GridEdge,
     GridEdgeWang,
@@ -156,8 +152,8 @@ impl TileAtlas {
                 todo!()
             }
             TileAtlasKind::GridCornerWang => {
-                let wang = GridCornerAtlas::from_wang(&image)?;
-                size = wang.cell_size();
+                // let wang = GridCornerAtlas::from_wang(&image)?;
+                // size = wang.cell_size();
             }
             TileAtlasKind::GridRpgMakerXP => {
                 todo!()

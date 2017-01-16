@@ -2,7 +2,7 @@
 
 mod traits;
 pub use crate::{
-    grids::{bg_set::GridBackgroundAtlas, corner_set::GridCornerAtlas, grid_edge_set::GridEdgeAtlas},
+    grids::{bg_set::GridBackgroundAtlas, corner_set::GridCornerOwned, grid_edge_set::GridEdgeAtlas},
     traits::{GridAtlas, TilesProvider},
 };
 pub use image::{RgbaImage, SubImage};
@@ -15,5 +15,5 @@ pub mod utils;
 pub use crate::{
     animations::standard::AnimationFrame,
     file_system::{FileSystemTiles, TileAtlasData, TileAtlasKind},
-    grids::corner_wang::GridCornerWang,
+    grids::{corner_set::GridCornerAtlas, corner_wang::GridCornerWang},
 };

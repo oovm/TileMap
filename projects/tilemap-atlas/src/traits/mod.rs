@@ -38,11 +38,3 @@ pub fn check_width_divide_by_16(image: &RgbaImage) {
     let cell_size = image.width() / 16;
     assert_eq!(image.height() % cell_size, 0, "image height {} does not divide by cell size {}", image.height(), cell_size);
 }
-
-pub fn check_wang4x4(wang: &RgbaImage) -> ImageResult<u32> {
-    let cell_size = wang.width() / 4;
-    if wang.width() % 4 != 0 || wang.width() != wang.height() {
-        dimension_error()?
-    }
-    Ok(cell_size)
-}

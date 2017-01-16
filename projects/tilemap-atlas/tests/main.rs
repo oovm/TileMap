@@ -9,9 +9,9 @@ fn ready() {
 
 #[test]
 fn test_atlas() {
-    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
-    debug_corner(&here.join("tests/atlas1"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
-    debug_corner(&here.join("tests/atlas2"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
+    // let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+    // debug_corner(&here.join("tests/atlas1"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
+    // debug_corner(&here.join("tests/atlas2"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
     // debug_corner(&here.join("tests/atlas3"), |image| GridCornerOwned::from_wang(image)).unwrap();
 }
 

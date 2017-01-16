@@ -15,5 +15,5 @@ pub mod utils;
 pub use crate::{
     animations::standard::AnimationFrame,
     file_system::{FileSystemTiles, TileAtlasData, TileAtlasKind},
-    grids::{corner_set::GridCornerAtlas, corner_wang::GridCornerWang},
+    grids::{corner_set::GridCornerAtlas, corner_wang::GridCornerWang, rpg_maker_xp::GridCornerRMXP},
 };

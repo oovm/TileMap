@@ -1,6 +1,6 @@
 use image::{ImageResult, RgbaImage};
 use std::path::Path;
-use tileset::{FileSystemTiles, GridAtlas, GridCornerOwned, GridEdgeAtlas, TileAtlasKind};
+use tileset::{FileSystemTiles, GridAtlas, GridCornerAtlas, GridEdgeOwned, TileAtlasKind};
 
 #[test]
 fn ready() {
@@ -15,24 +15,24 @@ fn test_atlas() {
     // debug_corner(&here.join("tests/atlas3"), |image| GridCornerOwned::from_wang(image)).unwrap();
 }
 
-pub fn debug_corner<F>(root: &Path, loader: F) -> ImageResult<()>
-where
-    F: Fn(&RgbaImage) -> ImageResult<GridCornerOwned>,
-{
-    let image = image::open(root.join("atlas.png"))?.to_rgba8();
-    let atlas = loader(&image)?;
-    atlas.save(root.join("atlas-std.png"))?;
-    for i in 0..16 {
-        let lu = (i & 1) != 0;
-        let ru = (i & 2) != 0;
-        let ld = (i & 4) != 0;
-        let rd = (i & 8) != 0;
-        let img = atlas.get_cell(lu, ru, ld, rd, 0);
-        let name = format!("corner-{}{}{}{}.png", rd as u8, ld as u8, ru as u8, lu as u8);
-        img.to_image().save(root.join(name))?;
-    }
-    Ok(())
-}
+// pub fn debug_corner<F>(root: &Path, loader: F) -> ImageResult<()>
+// where
+//     F: Fn(&RgbaImage) -> ImageResult<GridCornerAtlas>,
+// {
+//     let image = image::open(root.join("atlas.png"))?.to_rgba8();
+//     let atlas = loader(&image)?;
+//     atlas.save(root.join("atlas-std.png"))?;
+//     for i in 0..16 {
+//         let lu = (i & 1) != 0;
+//         let ru = (i & 2) != 0;
+//         let ld = (i & 4) != 0;
+//         let rd = (i & 8) != 0;
+//         let img = atlas.get_cell(lu, ru, ld, rd, 0);
+//         let name = format!("corner-{}{}{}{}.png", rd as u8, ld as u8, ru as u8, lu as u8);
+//         img.to_image().save(root.join(name))?;
+//     }
+//     Ok(())
+// }
 
 #[test]
 fn test_edge() {
@@ -42,7 +42,7 @@ fn test_edge() {
 
 pub fn debug_edge_from_wang(root: &Path) -> ImageResult<()> {
     let image = image::open(root.join("atlas.png"))?.to_rgba8();
-    let atlas = GridEdgeAtlas::from_wang(&image)?;
+    let atlas = GridEdgeOwned::from_wang(&image)?;
     atlas.save(root.join("atlas-std.png"))?;
     for i in 0..16 {
         let r = (i & 1) != 0;

@@ -1,7 +1,6 @@
 use super::*;
 
-impl GridEdgeAtlas {
-
+impl GridEdgeOwned {
     // pub fn load<P>(path: P) -> ImageResult<Self> where P: AsRef<std::path::Path> {
     //     let image = image::open(path)?.to_rgba8();
     //     let cell_size = image.width() / 16;
@@ -22,20 +21,14 @@ impl GridEdgeAtlas {
     // }
 }
 
-
-
-
-impl GridEdgeAtlas {
+impl GridEdgeOwned {
     /// A 4*4
     pub fn from_wang(wang: &RgbaImage) -> ImageResult<Self> {
         let cell_size = wang.width() / 4;
         if wang.width() % 4 != 0 || wang.width() != wang.height() {
             dimension_error()?
         }
-        let mut out = Self {
-            image: RgbaImage::new(cell_size * 16, cell_size),
-            count: [1; 16],
-        };
+        let mut out = Self { image: RgbaImage::new(cell_size * 16, cell_size), count: [1; 16] };
         for i in 0..16 {
             let view = make_wing_cell(wang, i, cell_size);
             out.image.copy_from(&view.to_image(), i * cell_size, 0)?;

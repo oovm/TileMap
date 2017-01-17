@@ -2,7 +2,7 @@
 
 mod traits;
 pub use crate::{
-    grids::{bg_set::GridBackgroundAtlas, corner_set::GridCornerOwned, grid_edge_set::GridEdgeAtlas},
+    grids::{bg_set::GridBackgroundAtlas, grid_edge_set::GridEdgeOwned},
     traits::{GridAtlas, TilesProvider},
 };
 pub use image::{RgbaImage, SubImage};

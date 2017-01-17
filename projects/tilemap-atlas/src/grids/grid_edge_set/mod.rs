@@ -25,12 +25,12 @@ mod ser;
 /// let cell = atlas.get_side(true, true, false, true);
 /// cell.save("side-1011.png").unwrap();
 /// ```
-pub struct GridEdgeAtlas {
+pub struct GridEdgeOwned {
     image: RgbaImage,
     count: [u8; 16],
 }
 
-impl GridEdgeAtlas {
+impl GridEdgeOwned {
     pub fn new(image: RgbaImage, count: [u8; 16]) -> Self {
         assert_eq!(image.width() % 16, 0, "image width {} does not divide by 16", image.width());
         let cell_size = image.width() / 16;
@@ -43,7 +43,7 @@ impl GridEdgeAtlas {
     }
 }
 
-impl GridAtlas for GridEdgeAtlas {
+impl GridAtlas for GridEdgeOwned {
     fn cell_size(&self) -> u32 {
         self.image.width() / 16
     }

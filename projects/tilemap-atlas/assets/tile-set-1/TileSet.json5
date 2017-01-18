@@ -1,17 +1,5 @@
 {
-    "size": 32,
-    "atlas": [
-        {
-            "name": "atlas",
-            "file": "atlas",
-            "cell_w": 32,
-            "cell_h": 32,
-            "custom": {
-                "type": "SimpleSet",
-                "columns": 1,
-                "rows": 1,
-                "count": 1
-            }
-        }
-    ]
+    "target_width": 32,
+    "target_height": 32,
+    "atlas": []
 }

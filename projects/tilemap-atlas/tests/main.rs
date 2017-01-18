@@ -1,6 +1,6 @@
-use image::{ImageResult, RgbaImage};
+use image::ImageResult;
 use std::path::Path;
-use tileset::{FileSystemTiles, GridAtlas, GridCornerAtlas, GridEdgeOwned, TileAtlasKind};
+use tileset::{FileSystemTiles, GridAtlas, GridEdgeOwned, TileAtlasKind};
 
 #[test]
 fn ready() {

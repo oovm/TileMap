@@ -25,34 +25,9 @@ mod ser;
 /// let cell = atlas.get_side(true, true, false, true);
 /// cell.save("side-1011.png").unwrap();
 /// ```
-pub struct GridEdgeOwned {
-    image: RgbaImage,
-    count: [u8; 16],
-}
-
-impl GridEdgeOwned {
-    pub fn new(image: RgbaImage, count: [u8; 16]) -> Self {
-        assert_eq!(image.width() % 16, 0, "image width {} does not divide by 16", image.width());
-        let cell_size = image.width() / 16;
-        assert_eq!(image.height() % cell_size, 0, "image height {} does not divide by cell size {}", image.height(), cell_size);
-        Self { image, count }
-    }
-    /// Create a grid edge atlas without check
-    pub unsafe fn create(image: RgbaImage, count: [u8; 16]) -> Self {
-        Self { image, count }
-    }
-}
-
-impl GridAtlas for GridEdgeOwned {
-    fn cell_size(&self) -> u32 {
-        self.image.width() / 16
-    }
-
-    fn get_cell(&self, l: bool, u: bool, r: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
-        let s = self.cell_size();
-        let i = ((l as u8) | (u as u8) << 1 | (r as u8) << 2 | (d as u8) << 3) as u32;
-        // SAFETY: index must be in range
-        let j = n % unsafe { *self.count.get_unchecked(i as usize) as u32 };
-        self.image.view(i * s, j * s, s, s)
-    }
+pub struct GridEdgeAtlas {
+    pub(crate) key: String,
+    pub(crate) cell_w: u32,
+    pub(crate) cell_h: u32,
+    pub(crate) count: [u32; 16],
 }

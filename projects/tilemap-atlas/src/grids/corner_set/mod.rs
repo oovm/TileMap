@@ -1,5 +1,4 @@
 use super::*;
-use serde::{Deserializer, Serializer};
 
 /// A tile atlas for gridded maps
 ///

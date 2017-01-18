@@ -21,15 +21,15 @@ impl TilesProvider for FileSystemTiles {}
 #[derive(Clone, Debug)]
 pub struct FileSystemTiles {
     workspace: PathBuf,
-    size_w: u32,
-    size_h: u32,
-    atlas: DashMap<String, TileAtlas>,
+    target_w: u32,
+    target_h: u32,
+    atlas: DashMap<String, TileAtlasData>,
     cache: DashMap<String, RgbaImage>,
 }
 
 impl Default for FileSystemTiles {
     fn default() -> Self {
-        Self { workspace: Default::default(), size_w: 32, size_h: 32, atlas: Default::default(), cache: Default::default() }
+        Self { workspace: Default::default(), target_w: 32, target_h: 32, atlas: Default::default(), cache: Default::default() }
     }
 }
 
@@ -48,19 +48,19 @@ impl FileSystemTiles {
 
     pub fn set_cell_size(&mut self, size: usize) -> ImageResult<()> {
         assert_ne!(size, 0, "The size of the atlas must be greater than zero");
-        self.size_w = size as u32;
+        self.target_w = size as u32;
         self.write_json()
     }
     pub fn get_cell_size(&self) -> u32 {
-        self.size_w
+        self.target_w
     }
-    pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
+    pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_corner_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
+    pub fn get_corner_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_side_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlas> {
+    pub fn get_side_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
     pub fn insert_atlas(&self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
@@ -69,8 +69,8 @@ impl FileSystemTiles {
             Some(name) => name.to_string(),
             None => io_error(format!("The file {:?} is not a valid image file", file_name), ErrorKind::InvalidInput)?,
         };
-        let atlas = TileAtlas::new(&self.workspace.join(file_name), &name, kind)?;
-        self.atlas.insert(name.clone(), atlas);
+        // let atlas = TileAtlas::new(&self.workspace.join(file_name), &name, kind)?;
+        // self.atlas.insert(name.clone(), atlas);
         self.write_json()?;
         Ok(name)
     }
@@ -84,20 +84,6 @@ impl FileSystemTiles {
             }
         }
     }
-}
-
-#[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct TileAtlas {
-    /// Tile atlas name
-    name: String,
-    /// Relative path to the file
-    file: String,
-    /// Size of the cell in pixels
-    cell_w: u32,
-    cell_h: u32,
-    ///
-    custom: TileAtlasData,
 }
 
 #[derive(Clone, Debug)]
@@ -142,7 +128,19 @@ impl Default for TileAtlasKind {
     }
 }
 
-impl TileAtlas {
+impl TileAtlasData {
+    pub fn get_name(&self) -> &str {
+        match self {
+            TileAtlasData::SimpleSet { .. } => "SimpleSet",
+            TileAtlasData::Animation(_) => "Animation",
+            TileAtlasData::GridCorner(v) => v.key.as_str(),
+            TileAtlasData::GridCornerWang(v) => v.get_key(),
+            TileAtlasData::GridRpgMakerXP(v) => v.get_key(),
+            TileAtlasData::GridEdge => "GridEdge",
+            TileAtlasData::GridEdgeWang => "GridEdgeWang",
+        }
+    }
+
     pub fn new(path: &Path, name: &str, kind: TileAtlasKind) -> ImageResult<Self> {
         let _image = image::open(&path)?.to_rgba8();
         let _size = 0;
@@ -164,6 +162,6 @@ impl TileAtlas {
                 todo!()
             }
         }
-        Ok(Self { name: name.to_string(), file: name.to_string(), cell_w: 32, cell_h: 32, custom: Default::default() })
+        todo!()
     }
 }

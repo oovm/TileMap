@@ -16,8 +16,8 @@ impl FileSystemTiles {
         let mut out = Self {
             // check path later
             workspace: PathBuf::from(workspace.as_ref()),
-            size_w: w as u32,
-            size_h: h as u32,
+            target_w: w as u32,
+            target_h: h as u32,
             ..Default::default()
         };
         out.ensure_path()?;
@@ -82,7 +82,7 @@ impl<'i, 'de> Visitor<'de> for VisitorFileSystemTiles<'i> {
     {
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
-                "size" => self.ptr.size_w = map.next_value()?,
+                "size" => self.ptr.target_w = map.next_value()?,
                 _ => {
                     map.next_value::<serde_json::Value>()?;
                 }

@@ -2,9 +2,6 @@ use crate::{traits::dimension_error, GridAtlas};
 use image::{GenericImage, GenericImageView, ImageResult, RgbaImage, SubImage};
 use std::path::Path;
 
-mod der;
-mod ser;
-
 /// A edge tile atlas for gridded maps
 ///
 /// It determine the pattern of the four corners of this grid according weather four sides (left, upper, left, lower) have the same elements.

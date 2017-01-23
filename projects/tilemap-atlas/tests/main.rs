@@ -1,5 +1,3 @@
-
-
 use tileset::{FileSystemTiles, TileAtlasKind};
 
 #[test]

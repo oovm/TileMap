@@ -1,7 +1,3 @@
-
-
-
-
 /// A edge tile atlas for gridded maps
 ///
 /// It determine the pattern of the four corners of this grid according weather four sides (left, upper, left, lower) have the same elements.

@@ -20,11 +20,16 @@ impl GridCornerRMXP {
     /// ```
     /// use tileset::GridCornerRMXP;
     /// ```
-    pub fn new<S>(key: S, width: u32, height: u32) -> Self
-    where
-        S: ToString,
-    {
+    pub fn new(key: &str, width: u32, height: u32) -> Self {
         Self { key: key.to_string(), cell_w: width, cell_h: height }
+    }
+    pub fn as_standard(&self, key: &str, image: &RgbaImage) -> ImageResult<(GridCornerAtlas, RgbaImage)> {
+        let mut output = RgbaImage::new(self.cell_w * 16, self.cell_h);
+        for i in 0..16 {
+            let view = view_rpg4x6_cell(image, i as u8)?;
+            output.copy_from(&view, i * self.cell_w, 0)?;
+        }
+        Ok((GridCornerAtlas { key: key.to_string(), cell_w: self.cell_w, cell_h: self.cell_h, count: [1; 16] }, output))
     }
 }
 

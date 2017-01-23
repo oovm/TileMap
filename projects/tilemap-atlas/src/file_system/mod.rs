@@ -63,7 +63,7 @@ impl FileSystemTiles {
     pub fn get_side_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn insert_atlas(&self, file_name: &str, kind: TileAtlasKind) -> ImageResult<String> {
+    pub fn insert_atlas(&self, file_name: &str, _kind: TileAtlasKind) -> ImageResult<String> {
         let name = Path::new(file_name).file_stem().and_then(|s| s.to_str()).filter(|s| !s.is_empty());
         let name = match name {
             Some(name) => name.to_string(),
@@ -141,7 +141,7 @@ impl TileAtlasData {
         }
     }
 
-    pub fn new(path: &Path, name: &str, kind: TileAtlasKind) -> ImageResult<Self> {
+    pub fn new(path: &Path, _name: &str, kind: TileAtlasKind) -> ImageResult<Self> {
         let _image = image::open(&path)?.to_rgba8();
         let _size = 0;
         match kind {

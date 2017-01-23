@@ -24,7 +24,7 @@ impl GridEdgeWang {
     {
         let mut output = RgbaImage::new(self.cell_w * 16, self.cell_h);
         for i in 0..16 {
-            let view = view_wang4x4c_cell(image, i as u8);
+            let view = view_wang4x4e_cell(image, i as u8);
             output.copy_from(&*view, i * self.cell_w, 0)?;
         }
         Ok((GridCornerAtlas { key: name.to_string(), cell_w: self.cell_w, cell_h: self.cell_h, count: [1; 16] }, output))
@@ -97,7 +97,7 @@ impl GridEdgeWang {
     pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
         let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;
         let image = self.get_image(root)?;
-        Ok(view_wang4x4c_cell(&image, mask).to_image())
+        Ok(view_wang4x4e_cell(&image, mask).to_image())
     }
 }
 
@@ -117,7 +117,7 @@ impl GridEdgeWang {
 // 0b1101 <- 14 <- (3, 1)
 // 0b1110 <- 13 <- (4, 2)
 // 0b1111 <- 15 <- (3, 2)
-fn make_wing_cell(r: &RgbaImage, mask: u32) -> SubImage<&RgbaImage> {
+fn view_wang4x4e_cell(r: &RgbaImage, mask: u8) -> SubImage<&RgbaImage> {
     let w = r.width() / 4;
     let h = r.height() / 4;
     match mask {

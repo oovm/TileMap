@@ -1,6 +1,6 @@
-use crate::{traits::dimension_error, GridAtlas};
-use image::{GenericImage, GenericImageView, ImageResult, RgbaImage, SubImage};
-use std::path::Path;
+
+
+
 
 /// A edge tile atlas for gridded maps
 ///

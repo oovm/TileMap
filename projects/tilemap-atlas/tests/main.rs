@@ -1,6 +1,6 @@
-use image::ImageResult;
-use std::path::Path;
-use tileset::{FileSystemTiles, GridAtlas, GridEdgeOwned, TileAtlasKind};
+
+
+use tileset::{FileSystemTiles, TileAtlasKind};
 
 #[test]
 fn ready() {
@@ -34,27 +34,27 @@ fn test_atlas() {
 //     Ok(())
 // }
 
-#[test]
-fn test_edge() {
-    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
-    debug_edge_from_wang(&here.join("tests/atlas4")).unwrap();
-}
-
-pub fn debug_edge_from_wang(root: &Path) -> ImageResult<()> {
-    let image = image::open(root.join("atlas.png"))?.to_rgba8();
-    let atlas = GridEdgeOwned::from_wang(&image)?;
-    atlas.save(root.join("atlas-std.png"))?;
-    for i in 0..16 {
-        let r = (i & 1) != 0;
-        let u = (i & 2) != 0;
-        let l = (i & 4) != 0;
-        let d = (i & 8) != 0;
-        let img = atlas.get_cell(l, u, r, d, 0);
-        let name = format!("side-{}{}{}{}.png", d as u8, r as u8, u as u8, l as u8);
-        img.to_image().save(root.join(name))?;
-    }
-    Ok(())
-}
+// #[test]
+// fn test_edge() {
+//     let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+//     debug_edge_from_wang(&here.join("tests/atlas4")).unwrap();
+// }
+//
+// pub fn debug_edge_from_wang(root: &Path) -> ImageResult<()> {
+//     let image = image::open(root.join("atlas.png"))?.to_rgba8();
+//     let atlas = GridEdgeOwned::from_wang(&image)?;
+//     atlas.save(root.join("atlas-std.png"))?;
+//     for i in 0..16 {
+//         let r = (i & 1) != 0;
+//         let u = (i & 2) != 0;
+//         let l = (i & 4) != 0;
+//         let d = (i & 8) != 0;
+//         let img = atlas.get_cell(l, u, r, d, 0);
+//         let name = format!("side-{}{}{}{}.png", d as u8, r as u8, u as u8, l as u8);
+//         img.to_image().save(root.join(name))?;
+//     }
+//     Ok(())
+// }
 
 #[test]
 fn test_fs() {

@@ -1,6 +1,6 @@
 [package]
 name = "tileset"
-version = "0.0.7"
+version = "0.1.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "Tailset definition, and supports importing multiple formats"
 repository = "https://github.com/oovm/Tilemap"
@@ -12,7 +12,6 @@ edition = "2021"
 [dependencies]
 itertools = "0.10.5"
 dashmap = "5.4.0"
-ndarray = "0.15.6"
 rand_core = "0.6.4"
 image = "0.24.6"
 serde = { version = "1.0.160", features = ["serde_derive"], optional = true  }

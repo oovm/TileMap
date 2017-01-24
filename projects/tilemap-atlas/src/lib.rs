@@ -10,9 +10,9 @@ mod grids;
 pub mod utils;
 pub use crate::{
     animations::standard::AnimationFrame,
-    file_system::{FileSystemTiles, TileAtlasData, TileAtlasKind},
+    file_system::{FileSystemTiles, TileAtlasData},
     grids::{
-        bg_set::GridBackgroundAtlas, corner_set::GridCornerAtlas, corner_wang::GridCornerWang, edge_set::GridEdgeAtlas,
+        bg_set::GridSimpleAtlas, corner_set::GridCornerAtlas, corner_wang::GridCornerWang, edge_set::GridEdgeAtlas,
         edge_wang::GridEdgeWang, rpg_maker_xp::GridCornerRMXP,
     },
     traits::{GridAtlas, TilesProvider},

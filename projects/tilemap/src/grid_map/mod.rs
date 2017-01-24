@@ -1,4 +1,3 @@
-use crossbeam_skiplist::SkipMap;
 use std::{
     collections::{BTreeMap, BTreeSet, VecDeque},
     sync::{Arc, LockResult, Mutex},
@@ -6,16 +5,13 @@ use std::{
 use tileset::{GridAtlas, TilesProvider};
 
 /// Shared tile grid atlas.
-pub struct GridTileManager<P: TilesProvider> {
-    tiles: Arc<P>,
+pub struct GridTileManager {
+    tiles: Arc<dyn TilesProvider>,
 }
 
-impl<P> GridTileManager<P>
-where
-    P: TilesProvider,
-{
-    pub fn new(provider: P) -> Self {
-        Self { tiles: Arc::new(provider) }
+impl GridTileManager {
+    pub fn new(provider: Arc<dyn TilesProvider>) -> Self {
+        Self { tiles: provider }
     }
 }
 

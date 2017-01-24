@@ -3,6 +3,7 @@ use crate::{
     GridSimpleAtlas, TilesProvider,
 };
 
+use crate::utils::grid_corner_mask;
 use dashmap::DashMap;
 use image::{ImageResult, RgbaImage};
 use serde::{Deserialize, Serialize};
@@ -25,7 +26,14 @@ pub struct FileSystemTiles {
     target_w: NonZeroU32,
     target_h: NonZeroU32,
     atlas: DashMap<String, TileAtlasData>,
-    cache: DashMap<String, RgbaImage>,
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct TileQuery {
+    name: String,
+    kind: TileAtlasKind,
+    mask: u8,
+    index: u8,
 }
 
 impl Default for FileSystemTiles {
@@ -71,13 +79,18 @@ impl FileSystemTiles {
     pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool) -> Option<TileAtlasData> {
+    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool) -> Option<RgbaImage> {
+        let key = name.to_string();
+        let mask = grid_corner_mask(lu, ru, ld, rd);
+        if let Some(v) = self.cache.get(&(key, mask)) {
+            return Some(v.value().clone());
+        }
         match self.atlas.get(name)?.value() {
             TileAtlasData::SimpleSet(_) => None,
             TileAtlasData::Animation(_) => None,
             TileAtlasData::GridCorner(_) => None,
-            TileAtlasData::GridCornerWang(v) => v.load_corner_by_mask(&self.workspace, mask),
-            TileAtlasData::GridRpgMakerXP(v) => v.load_corner_by_mask(&self.workspace, mask),
+            TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask),
+            TileAtlasData::GridRpgMakerXP(v) => v.load_corner(&self.workspace, mask),
             TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
         }
@@ -100,6 +113,12 @@ impl FileSystemTiles {
             }
         }
     }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum TileAtlasKind {
+    GridCorner,
 }
 
 #[derive(Clone, Debug)]

@@ -7,17 +7,13 @@ use serde::{
 use std::fmt::Formatter;
 
 impl FileSystemTiles {
-    pub fn new<S>(workspace: S, w: usize, h: usize) -> ImageResult<Self>
+    pub fn new<S>(workspace: S) -> ImageResult<Self>
     where
         S: AsRef<Path>,
     {
-        assert_ne!(w, 0, "The width of the atlas must be greater than zero");
-        assert_ne!(h, 0, "The height of the atlas must be greater than zero");
         let mut out = Self {
             // check path later
             workspace: PathBuf::from(workspace.as_ref()),
-            target_w: w as u32,
-            target_h: h as u32,
             ..Default::default()
         };
         out.ensure_path()?;
@@ -82,7 +78,7 @@ impl<'i, 'de> Visitor<'de> for VisitorFileSystemTiles<'i> {
     {
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
-                "size" => self.ptr.target_w = map.next_value()?,
+                // "size" => self.ptr.target_w = map.next_value()?,
                 _ => {
                     map.next_value::<serde_json::Value>()?;
                 }

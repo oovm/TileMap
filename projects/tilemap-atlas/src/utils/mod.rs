@@ -14,3 +14,7 @@ where
 }
 
 pub struct AnimationSlice {}
+
+pub fn grid_corner_mask(lu: bool, ru: bool, ld: bool, rd: bool) -> u8 {
+    (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3
+}

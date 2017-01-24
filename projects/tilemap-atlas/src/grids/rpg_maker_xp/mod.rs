@@ -88,10 +88,13 @@ impl GridCornerRMXP {
     /// ```
     /// use tileset::GridCornerRMXP;
     /// ```
-    pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
+    pub fn load_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
         let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;
+        unsafe { self.load_corner_by_mask(root, mask) }
+    }
+    pub unsafe fn load_corner_by_mask(&self, root: &Path, mask: u8) -> ImageResult<RgbaImage> {
         let image = self.get_image(root)?;
-        view_rpg4x6_cell(&image, mask)
+        Ok(view_rpg4x6_cell(&image, mask).to_image())
     }
 }
 

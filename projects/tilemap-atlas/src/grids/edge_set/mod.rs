@@ -1,3 +1,5 @@
+use super::*;
+
 /// A edge tile atlas for gridded maps
 ///
 /// It determine the pattern of the four corners of this grid according weather four sides (left, upper, left, lower) have the same elements.
@@ -18,9 +20,17 @@
 /// let cell = atlas.get_side(true, true, false, true);
 /// cell.save("side-1011.png").unwrap();
 /// ```
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct GridEdgeAtlas {
     pub(crate) key: String,
     pub(crate) cell_w: u32,
     pub(crate) cell_h: u32,
     pub(crate) count: [u32; 16],
+}
+
+impl GridEdgeAtlas {
+    pub fn get_key(&self) -> &str {
+        &self.key
+    }
 }

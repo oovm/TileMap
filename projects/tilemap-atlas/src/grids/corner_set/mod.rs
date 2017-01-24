@@ -26,5 +26,11 @@ pub struct GridCornerAtlas {
     pub(crate) key: String,
     pub(crate) cell_w: u32,
     pub(crate) cell_h: u32,
-    pub(crate) count: [u32; 16],
+    pub(crate) count: [u8; 16],
+}
+
+impl GridCornerAtlas {
+    pub fn get_key(&self) -> &str {
+        &self.key
+    }
 }

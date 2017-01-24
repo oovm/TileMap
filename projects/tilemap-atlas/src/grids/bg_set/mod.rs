@@ -1,25 +1,17 @@
 use super::*;
 
-pub struct GridBackgroundAtlas {
-    image: RgbaImage,
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct GridSimpleAtlas {
+    key: String,
+    cell_w: u32,
+    cell_h: u32,
+    grid_w: u32,
+    grid_h: u32,
 }
 
-impl GridBackgroundAtlas {
-    pub fn new(image: RgbaImage) -> Self {
-        assert_eq!(image.width(), image.height(), "The width and height of the image must be equal");
-        Self { image }
-    }
-    pub unsafe fn create(image: RgbaImage) -> Self {
-        Self { image }
-    }
-}
-
-impl GridAtlas for GridBackgroundAtlas {
-    fn cell_size(&self) -> u32 {
-        self.image.width()
-    }
-
-    fn get_cell(&self, _: bool, _: bool, _: bool, _: bool, _: u32) -> SubImage<&RgbaImage> {
-        self.image.view(0, 0, self.image.width(), self.image.height())
+impl GridSimpleAtlas {
+    pub fn get_key(&self) -> &str {
+        &self.key
     }
 }

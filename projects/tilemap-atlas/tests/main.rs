@@ -1,4 +1,4 @@
-use tileset::{FileSystemTiles, TileAtlasKind};
+use tileset::{FileSystemTiles, GridCornerAtlas, GridCornerWang, TileAtlasData};
 
 #[test]
 fn ready() {
@@ -57,5 +57,7 @@ fn test_atlas() {
 #[test]
 fn test_fs() {
     let pvd = FileSystemTiles::new("assets/tile-set-1/", 32, 32).unwrap();
-    pvd.insert_atlas("atlas.png", TileAtlasKind::GridCornerWang).unwrap();
+    pvd.insert_atlas("atlas1", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("a", 32, 32)))).unwrap();
+    pvd.insert_atlas("atlas2", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("b", 32, 32)))).unwrap();
+    pvd.insert_atlas("atlas3", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("c", 32, 32)))).unwrap();
 }

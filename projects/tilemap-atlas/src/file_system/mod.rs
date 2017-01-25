@@ -28,14 +28,6 @@ pub struct FileSystemTiles {
     atlas: DashMap<String, TileAtlasData>,
 }
 
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct TileQuery {
-    name: String,
-    kind: TileAtlasKind,
-    mask: u8,
-    index: u8,
-}
-
 impl Default for FileSystemTiles {
     fn default() -> Self {
         unsafe {
@@ -44,7 +36,6 @@ impl Default for FileSystemTiles {
                 target_w: NonZeroU32::new_unchecked(32),
                 target_h: NonZeroU32::new_unchecked(32),
                 atlas: Default::default(),
-                cache: Default::default(),
             }
         }
     }
@@ -79,18 +70,14 @@ impl FileSystemTiles {
     pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool) -> Option<RgbaImage> {
-        let key = name.to_string();
+    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool, index: u8) -> Option<RgbaImage> {
         let mask = grid_corner_mask(lu, ru, ld, rd);
-        if let Some(v) = self.cache.get(&(key, mask)) {
-            return Some(v.value().clone());
-        }
         match self.atlas.get(name)?.value() {
             TileAtlasData::SimpleSet(_) => None,
             TileAtlasData::Animation(_) => None,
-            TileAtlasData::GridCorner(_) => None,
-            TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask),
-            TileAtlasData::GridRpgMakerXP(v) => v.load_corner(&self.workspace, mask),
+            TileAtlasData::GridCorner(v) => v.load_corner(&self.workspace, mask as u32, index as u32).ok(),
+            TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask).ok(),
+            TileAtlasData::GridRpgMakerXP(v) => v.load_corner(&self.workspace, mask).ok(),
             TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
         }

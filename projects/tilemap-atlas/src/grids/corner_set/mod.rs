@@ -1,4 +1,5 @@
 use super::*;
+use crate::traits::dimension_error;
 
 /// A tile atlas for gridded maps
 ///
@@ -29,8 +30,20 @@ pub struct GridCornerAtlas {
     pub(crate) count: [u8; 16],
 }
 
+/// Getters
 impl GridCornerAtlas {
     pub fn get_key(&self) -> &str {
         &self.key
+    }
+    pub fn load_image(&self, root: &Path) -> ImageResult<RgbaImage> {
+        Ok(image::open(root.join(&self.key))?.to_rgba8())
+    }
+    pub fn load_corner(&self, root: &Path, mask: u32, index: u32) -> ImageResult<RgbaImage> {
+        match self.count.get(mask as usize) {
+            Some(s) if s.saturating_sub(1) >= index as u8 => {}
+            _ => dimension_error()?,
+        }
+        let image = self.load_image(root)?;
+        Ok(image.view(mask * self.cell_w, index * self.cell_h, self.cell_w, self.cell_h).to_image())
     }
 }

@@ -7,7 +7,7 @@ use serde::{
 use std::fmt::Formatter;
 
 impl FileSystemTiles {
-    pub fn new<S>(workspace: S) -> ImageResult<Self>
+    pub fn new<S>(workspace: S, width: u32, height: u32) -> ImageResult<Self>
     where
         S: AsRef<Path>,
     {
@@ -17,7 +17,8 @@ impl FileSystemTiles {
             ..Default::default()
         };
         out.ensure_path()?;
-        out.write_json()?;
+        // include write json
+        out.set_target_size(width, height)?;
         Ok(out)
     }
     fn ensure_path(&mut self) -> ImageResult<()> {

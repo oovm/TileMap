@@ -91,21 +91,10 @@ impl GridCornerRMXP {
     pub fn load_corner(&self, root: &Path, mask: u8) -> ImageResult<RgbaImage> {
         debug_assert!(mask >= 16, "corner mask {} is not in range [0b0000, 0b1111]", mask);
         let image = self.get_image(root)?;
-        Ok(view_rpg4x6_cell(&image, mask).to_image())
+        Ok(view_rpg4x6_cell(&image, mask)?)
     }
 }
 
-// pub fn from_rpg_maker_xp(rpg: &RgbaImage) -> ImageResult<Self> {
-//     assert_eq!(rpg.width() % 4, 0, "image width {} does not divide by 4", rpg.width());
-//     assert_eq!(rpg.height() % 6, 0, "image height {} does not divide by 6", rpg.height());
-//     let half_cell = rpg.width() / 4;
-//     let mut out = Self { image: RgbaImage::new(half_cell * 16 * 2, half_cell * 2), count: [1; 16] };
-//     for i in 0..16 {
-//         let view = view_rpg4x6_cell(rpg, i, half_cell)?;
-//         out.image.copy_from(&view, i * half_cell * 2, 0)?;
-//     }
-//     Ok(out)
-// }
 /// ```js
 /// 0b0000 <- [(1, 1), (2, 1), (1, 2), (2, 2)]
 /// 0b0001 <- [(4, 6), (2, 1), (1, 2), (2, 2)]

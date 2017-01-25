@@ -15,10 +15,7 @@ use super::*;
 /// Suppose we have such an atlas in standard form called `atlas-std.png`;
 ///
 /// ```no_run
-/// # use tileset::TailCornerAtlas;
-/// let atlas = TailCornerAtlas::load("atlas-std.png").unwrap();
-/// let cell = atlas.get_side(true, true, false, true);
-/// cell.save("side-1011.png").unwrap();
+/// # use tileset::GridEdgeAtlas;
 /// ```
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

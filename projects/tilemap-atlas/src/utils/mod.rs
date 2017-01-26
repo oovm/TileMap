@@ -16,7 +16,7 @@ where
         for col in 0..cols {
             let view = image.view(col * cell_width, row * cell_height, cell_width, cell_height);
             let mut out = dir.join(format!("{}-{}-{}.png", name.to_str().unwrap(), col, row));
-            view.save(&out)?;
+            view.to_image().save(&out)?;
         }
     }
     Ok(())

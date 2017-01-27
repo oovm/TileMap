@@ -12,5 +12,6 @@ pub mod rpg_maker_xp;
 use crate::GridCornerAtlas;
 
 use std::path::{Path, PathBuf};
+pub mod complete;
 pub mod edge_wang;
 pub mod rpg_maker_mv;

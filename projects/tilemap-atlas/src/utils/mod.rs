@@ -1,4 +1,5 @@
 use image::{GenericImageView, ImageResult};
+use itertools::Itertools;
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
@@ -120,58 +121,57 @@ impl MaskBuilder {
         masks
     }
     pub fn blob7x7_set() -> Self {
-        let mut masks = MaskBuilder::new(1, 4);
+        let mut masks = MaskBuilder::new(1, 1);
         // part1
-        masks.has_bits((1, 1), &[4]);
-        masks.has_bits((2, 1), &[2, 4]);
-        masks.has_bits((3, 1), &[2, 4, 6]);
-        masks.has_bits((4, 1), &[4, 6]);
-        masks.has_bits((1, 2), &[0, 4]);
-        masks.has_bits((2, 2), &[0, 2, 4]);
-        masks.has_bits((3, 2), &[0, 2, 4, 6]);
-        masks.has_bits((4, 2), &[0, 4, 6]);
-        masks.has_bits((1, 3), &[0]);
-        masks.has_bits((2, 3), &[0, 2]);
-        masks.has_bits((3, 3), &[0, 2, 6]);
-        masks.has_bits((4, 3), &[0, 6]);
         // <default>
-        masks.has_bits((2, 4), &[2]);
-        masks.has_bits((3, 4), &[2, 6]);
-        masks.has_bits((4, 4), &[6]);
-        // part2, &[0, 1, 2, 3, 4, 5, 6, 7]
-        masks.has_bits((5, 1), &[0, 2, 4, 6, 7]);
-        masks.has_bits((6, 1), &[2, 3, 4, 6]);
-        masks.has_bits((7, 1), &[2, 4, 5, 6]);
-        masks.has_bits((8, 1), &[0, 1, 2, 4, 6]);
-        masks.has_bits((5, 2), &[0, 2, 3, 4]);
-        masks.has_bits((6, 2), &[0, 1, 2, 3, 4, 5, 6]);
-        masks.has_bits((7, 2), &[0, 2, 3, 4, 5, 6, 7]);
-        masks.has_bits((8, 2), &[0, 4, 5, 6]);
-        masks.has_bits((5, 3), &[0, 1, 2, 4]);
-        masks.has_bits((6, 3), &[0, 1, 2, 3, 4, 6, 7]);
-        masks.has_bits((7, 3), &[0, 1, 2, 4, 5, 6, 7]);
-        masks.has_bits((8, 3), &[0, 4, 6, 7]);
-        masks.has_bits((5, 4), &[0, 2, 4, 5, 6]);
-        masks.has_bits((6, 4), &[0, 1, 2, 6]);
-        masks.has_bits((7, 4), &[0, 2, 6, 7]);
-        masks.has_bits((8, 4), &[0, 2, 3, 4, 6]);
-        // part3
-        masks.has_bits((9, 1), &[2, 3, 4]);
-        masks.has_bits((10, 1), &[0, 2, 3, 4, 5, 6]);
-        masks.has_bits((11, 1), &[2, 3, 4, 5, 6]);
-        masks.has_bits((12, 1), &[4, 5, 6]);
-        masks.has_bits((9, 2), &[0, 1, 2, 3, 4]);
-        masks.has_bits((10, 2), &[0, 1, 2, 4, 5, 6]);
-        masks.has_bits((11, 2), &[]);
-        masks.has_bits((12, 2), &[0, 2, 4, 5, 6, 7]);
-        masks.has_bits((9, 3), &[0, 1, 2, 3, 4, 6]);
-        masks.has_bits((10, 3), &[0, 1, 2, 3, 4, 5, 6, 7]);
-        masks.has_bits((11, 3), &[0, 2, 3, 4, 6, 7]);
-        masks.has_bits((12, 3), &[0, 4, 5, 6, 7]);
-        masks.has_bits((9, 4), &[0, 1, 2]);
-        masks.has_bits((10, 4), &[0, 1, 2, 6, 7]);
-        masks.has_bits((11, 4), &[0, 1, 2, 4, 6, 7]);
-        masks.has_bits((12, 4), &[0, 6, 7]);
+        masks.has_mask((2, 1), 4);
+        masks.has_mask((3, 1), 92);
+        masks.has_mask((4, 1), 124);
+        masks.has_mask((5, 1), 116);
+        masks.has_mask((6, 1), 80);
+        // <excess>
+        masks.has_mask((2, 1), 16);
+        masks.has_mask((2, 2), 20);
+        masks.has_mask((2, 3), 87);
+        masks.has_mask((2, 4), 223);
+        masks.has_mask((2, 5), 241);
+        masks.has_mask((2, 6), 21);
+        masks.has_mask((2, 7), 64);
+        masks.has_mask((3, 1), 29);
+        masks.has_mask((3, 2), 117);
+        masks.has_mask((3, 3), 85);
+        masks.has_mask((3, 4), 71);
+        masks.has_mask((3, 5), 221);
+        masks.has_mask((3, 6), 125);
+        masks.has_mask((3, 7), 112);
+        masks.has_mask((4, 1), 31);
+        masks.has_mask((4, 2), 253);
+        masks.has_mask((4, 3), 113);
+        masks.has_mask((4, 4), 28);
+        masks.has_mask((4, 5), 127);
+        masks.has_mask((4, 6), 247);
+        masks.has_mask((4, 7), 209);
+        masks.has_mask((5, 1), 23);
+        masks.has_mask((5, 2), 199);
+        masks.has_mask((5, 3), 213);
+        masks.has_mask((5, 4), 95);
+        masks.has_mask((5, 5), 255);
+        masks.has_mask((5, 6), 245);
+        masks.has_mask((5, 7), 81);
+        masks.has_mask((6, 1), 5);
+        masks.has_mask((6, 2), 84);
+        masks.has_mask((6, 3), 93);
+        masks.has_mask((6, 4), 119);
+        masks.has_mask((6, 5), 215);
+        masks.has_mask((6, 6), 193);
+        masks.has_mask((6, 7), 17);
+        masks.has_mask((7, 1), 0);
+        masks.has_mask((7, 2), 1);
+        masks.has_mask((7, 3), 7);
+        masks.has_mask((7, 4), 197);
+        masks.has_mask((7, 5), 69);
+        masks.has_mask((7, 6), 68);
+        masks.has_mask((7, 7), 65);
 
         masks
     }
@@ -179,5 +179,7 @@ impl MaskBuilder {
 
 #[test]
 fn test22() {
-    println!("{}", MaskBuilder::complete_set());
+    println!("{:?}", MaskBuilder::complete_set().map.keys().collect_vec());
+
+    println!("{}", MaskBuilder::blob7x7_set());
 }

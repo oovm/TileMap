@@ -1,10 +1,10 @@
 use crate::GridCompleteAtlas;
-use image::{GenericImageView, ImageResult};
+use image::{GenericImageView, ImageResult, RgbaImage};
 use itertools::Itertools;
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 pub fn decompose_image_grid_by_cells<P>(path: P, cols: u32, rows: u32) -> ImageResult<()>
@@ -192,6 +192,26 @@ where
     let raw = image::open(image.as_ref())?.to_rgba8();
     let new = GridCompleteAtlas::from_blob7x7a(&raw, raw.width() / 7, raw.height() / 7);
     new.save(path.with_file_name(new_name))
+}
+
+pub fn convert_edge4x4<P>(image: P) -> ImageResult<()>
+where
+    P: AsRef<Path>,
+{
+    let (raw, output) = image_with_new_path(image)?;
+    let new = GridCompleteAtlas::from_edge4x4(&raw, raw.width() / 4, raw.height() / 4);
+    new.save(output)
+}
+
+fn image_with_new_path<P>(image: P) -> ImageResult<(RgbaImage, PathBuf)>
+where
+    P: AsRef<Path>,
+{
+    let path = image.as_ref().canonicalize()?;
+    let raw = image::open(image.as_ref())?.to_rgba8();
+    let new_name = path.file_stem().and_then(|s| s.to_str()).map(|s| format!("{}-std.png", s)).unwrap();
+    let new_path = path.with_file_name(new_name);
+    Ok((raw, new_path))
 }
 
 #[test]

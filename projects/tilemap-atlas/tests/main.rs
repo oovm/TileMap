@@ -4,7 +4,10 @@ use std::{
     fmt::{Display, Formatter},
     path::Path,
 };
-use tileset::{utils::convert_blob7x7a, FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData};
+use tileset::{
+    utils::{convert_blob7x7a, convert_edge4x4},
+    FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData,
+};
 
 #[test]
 fn ready() {
@@ -14,12 +17,22 @@ fn ready() {
 #[test]
 fn test_atlas() {
     let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+    // blob 7x7 type a
     convert_blob7x7a(&here.join("tests/blob7x7_a/bridge.png")).unwrap();
     convert_blob7x7a(&here.join("tests/blob7x7_a/commune.png")).unwrap();
     convert_blob7x7a(&here.join("tests/blob7x7_a/dungeon.png")).unwrap();
     convert_blob7x7a(&here.join("tests/blob7x7_a/islands.png")).unwrap();
     convert_blob7x7a(&here.join("tests/blob7x7_a/trench.png")).unwrap();
     convert_blob7x7a(&here.join("tests/blob7x7_a/wangbl.png")).unwrap();
+    // edge 4x4
+    convert_edge4x4(&here.join("tests/edge4x4/wang2e.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/pipe1.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/zigzag.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/greek.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/brickwall.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/circuit.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/laser.png")).unwrap();
+    convert_edge4x4(&here.join("tests/edge4x4/octal.png")).unwrap();
 }
 
 // #[test]

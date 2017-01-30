@@ -1,8 +1,10 @@
+use image::ImageResult;
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
+    path::Path,
 };
-use tileset::{FileSystemTiles, GridCornerAtlas, GridCornerWang, TileAtlasData};
+use tileset::{utils::convert_blob7x7a, FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData};
 
 #[test]
 fn ready() {
@@ -11,30 +13,14 @@ fn ready() {
 
 #[test]
 fn test_atlas() {
-    // let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
-    // debug_corner(&here.join("tests/atlas1"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
-    // debug_corner(&here.join("tests/atlas2"), |image| GridCornerOwned::from_rpg_maker_xp(image)).unwrap();
-    // debug_corner(&here.join("tests/atlas3"), |image| GridCornerOwned::from_wang(image)).unwrap();
+    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/bridge.png")).unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/commune.png")).unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/dungeon.png")).unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/islands.png")).unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/trench.png")).unwrap();
+    convert_blob7x7a(&here.join("tests/blob7x7_a/wangbl.png")).unwrap();
 }
-
-// pub fn debug_corner<F>(root: &Path, loader: F) -> ImageResult<()>
-// where
-//     F: Fn(&RgbaImage) -> ImageResult<GridCornerAtlas>,
-// {
-//     let image = image::open(root.join("atlas.png"))?.to_rgba8();
-//     let atlas = loader(&image)?;
-//     atlas.save(root.join("atlas-std.png"))?;
-//     for i in 0..16 {
-//         let lu = (i & 1) != 0;
-//         let ru = (i & 2) != 0;
-//         let ld = (i & 4) != 0;
-//         let rd = (i & 8) != 0;
-//         let img = atlas.get_cell(lu, ru, ld, rd, 0);
-//         let name = format!("corner-{}{}{}{}.png", rd as u8, ld as u8, ru as u8, lu as u8);
-//         img.to_image().save(root.join(name))?;
-//     }
-//     Ok(())
-// }
 
 // #[test]
 // fn test_edge() {

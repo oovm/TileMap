@@ -5,7 +5,7 @@ use std::{
     path::Path,
 };
 use tileset::{
-    utils::{convert_blob7x7a, convert_edge4x4},
+    utils::{convert_blob7x7a, convert_edge4x4, decompose_image_grid_by_cells},
     FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData,
 };
 
@@ -33,6 +33,14 @@ fn test_atlas() {
     convert_edge4x4(&here.join("tests/edge4x4/circuit.png")).unwrap();
     convert_edge4x4(&here.join("tests/edge4x4/laser.png")).unwrap();
     convert_edge4x4(&here.join("tests/edge4x4/octal.png")).unwrap();
+    // corner 4x4
+    convert_edge4x4(&here.join("tests/corner4x4/lido.png")).unwrap();
+}
+
+#[test]
+fn test_dep() {
+    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+    decompose_image_grid_by_cells(&here.join("tests/atlas1/atlas.png"), 4, 6).unwrap();
 }
 
 // #[test]

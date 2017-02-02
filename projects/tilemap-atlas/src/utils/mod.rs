@@ -1,4 +1,4 @@
-use crate::GridCompleteAtlas;
+use crate::{GridCompleteAtlas, GridCornerRMXP};
 use image::{GenericImageView, ImageResult, RgbaImage};
 use itertools::Itertools;
 use std::{
@@ -200,6 +200,15 @@ where
 {
     let (raw, output) = image_with_new_path(image)?;
     let new = GridCompleteAtlas::from_edge4x4(&raw, raw.width() / 4, raw.height() / 4);
+    new.save(output)
+}
+
+pub fn convert_rpg4x6<P>(image: P) -> ImageResult<()>
+where
+    P: AsRef<Path>,
+{
+    let (raw, output) = image_with_new_path(image)?;
+    let new = GridCornerRMXP::make_complete(&raw, raw.width() / 4, raw.height() / 6);
     new.save(output)
 }
 

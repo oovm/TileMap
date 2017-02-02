@@ -5,7 +5,7 @@ use std::{
     path::Path,
 };
 use tileset::{
-    utils::{convert_blob7x7a, convert_edge4x4, decompose_image_grid_by_cells},
+    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, decompose_image_grid_by_cells},
     FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData,
 };
 
@@ -34,7 +34,8 @@ fn test_atlas() {
     convert_edge4x4(&here.join("tests/edge4x4/laser.png")).unwrap();
     convert_edge4x4(&here.join("tests/edge4x4/octal.png")).unwrap();
     // corner 4x4
-    convert_edge4x4(&here.join("tests/corner4x4/lido.png")).unwrap();
+    convert_rpg4x6(&here.join("tests/rpg4x6/atlas.png")).unwrap();
+    convert_rpg4x6(&here.join("tests/rpg4x6/grass.png")).unwrap();
 }
 
 #[test]

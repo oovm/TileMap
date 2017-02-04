@@ -1,4 +1,4 @@
-use crate::{GridCompleteAtlas, GridCornerRMXP};
+use crate::{GridCompleteAtlas, GridCornerRMVXFile};
 use image::{GenericImageView, ImageResult, RgbaImage};
 use itertools::Itertools;
 use std::{
@@ -208,7 +208,7 @@ where
     P: AsRef<Path>,
 {
     let (raw, output) = image_with_new_path(image)?;
-    let new = GridCornerRMXP::make_complete(&raw, raw.width() / 4, raw.height() / 6);
+    let new = GridCornerRMVXFile::make_complete(&raw, raw.width() / 4, raw.height() / 6);
     new.save(output)
 }
 

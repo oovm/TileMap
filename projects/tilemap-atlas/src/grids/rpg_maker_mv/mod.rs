@@ -2,13 +2,19 @@ use super::*;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GridCornerRMMV {
+pub struct GridCornerRMXPFile {
     key: String,
     cell_w: u32,
     cell_h: u32,
 }
 
-impl GridCornerRMMV {
+pub struct GridCornerRMMV {
+    image: RgbaImage,
+    cell_w: u32,
+    cell_h: u32,
+}
+
+impl GridCornerRMXPFile {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics
@@ -18,7 +24,7 @@ impl GridCornerRMMV {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn new<S>(key: S, width: u32, height: u32) -> Self
     where
@@ -29,7 +35,7 @@ impl GridCornerRMMV {
 }
 
 // getters
-impl GridCornerRMMV {
+impl GridCornerRMXPFile {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics
@@ -39,7 +45,7 @@ impl GridCornerRMMV {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_key(&self) -> &str {
         &self.key
@@ -53,7 +59,7 @@ impl GridCornerRMMV {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_path(&self, root: &Path) -> PathBuf {
         root.join(&self.key)
@@ -67,7 +73,7 @@ impl GridCornerRMMV {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
         Ok(image::open(self.get_path(root))?.to_rgba8())
@@ -81,7 +87,7 @@ impl GridCornerRMMV {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
         let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;

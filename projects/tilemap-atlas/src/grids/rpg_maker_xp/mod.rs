@@ -2,13 +2,19 @@ use super::*;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GridCornerRMXP {
+pub struct GridCornerRMVXFile {
     key: String,
     cell_w: u32,
     cell_h: u32,
 }
 
-impl GridCornerRMXP {
+pub struct GridCornerRMXP {
+    image: RgbaImage,
+    cell_w: u32,
+    cell_h: u32,
+}
+
+impl GridCornerRMVXFile {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics
@@ -18,7 +24,7 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn new(key: &str, width: u32, height: u32) -> Self {
         Self { key: key.to_string(), cell_w: width, cell_h: height }
@@ -47,7 +53,7 @@ impl GridCornerRMXP {
 }
 
 // getters
-impl GridCornerRMXP {
+impl GridCornerRMVXFile {
     /// Create a new tile set from rpg maker atlas.
     ///
     /// ## Panics
@@ -57,7 +63,7 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_key(&self) -> &str {
         &self.key
@@ -71,7 +77,7 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_path(&self, root: &Path) -> PathBuf {
         root.join(&self.key)
@@ -85,7 +91,7 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
         Ok(image::open(self.get_path(root))?.to_rgba8())
@@ -99,7 +105,7 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// use tileset::GridCornerRMVXFile;
     /// ```
     pub fn load_corner(&self, root: &Path, mask: u8) -> ImageResult<RgbaImage> {
         debug_assert!(mask >= 16, "corner mask {} is not in range [0b0000, 0b1111]", mask);

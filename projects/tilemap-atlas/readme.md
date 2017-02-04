@@ -1,10 +1,9 @@
 # TileSets
 
-
-
 ## Standard Format
 
-The standard save format of the library is a row of 16 tiles, if there is a variant, placed directly below the corresponding position.
+The standard save format of the library is a row of 16 tiles, if there is a variant, placed directly below the
+corresponding position.
 
 Ideally you should provide sprites with transparency channels.
 
@@ -14,15 +13,20 @@ Ideally you should provide sprites with transparency channels.
 
 - You can download tile sets from these sites:
 
+- [itch.io](https://itch.io/game-assets/tag-tileset)
 - [opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=tileset)
-- [kenney.nl](https://kenney.nl/assets)
 - [cr31.co.uk](http://www.cr31.co.uk/stagecast/wang/tiles_c.html)
+- [kenney.nl](https://kenney.nl/assets)
 
 For tiles in non-standard cases, conversion functions are provided.
 
-#### RPG Maker XP tiles:
+#### RPG Maker XP tiles
 
 - [GridCornerAtlas::from_rpg_maker_xp](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
+
+![](https://github.com/oovm/TileMap/blob/dev/projects/tilemap-atlas/tests/rpg4x6/atlas.png)
+
+
 
 #### RPG Maker MV tiles
 
@@ -40,12 +44,7 @@ For tiles in non-standard cases, conversion functions are provided.
 
 - [GridEdgeAtlas::from_wang](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
 
-
 ## Packed Format
-
-
-
-
 
 ## Questions and Answers
 
@@ -63,4 +62,5 @@ The library does not (and will not) support this, you must You have to manually 
 
 ### Q: NavMeshes, Layers?
 
-This library is only for resource management, please use [TileMap](https://github.com/oovm/Tilemap/tree/dev/projects/tilemap) for related functions.
+This library is only for resource management, please
+use [TileMap](https://github.com/oovm/Tilemap/tree/dev/projects/tilemap) for related functions.

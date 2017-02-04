@@ -1,5 +1,5 @@
 use crate::{
-    traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerRMXP, GridCornerWang, GridEdgeAtlas, GridEdgeWang,
+    traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerRMVXFile, GridCornerWang, GridEdgeAtlas, GridEdgeWang,
     GridSimpleAtlas, TilesProvider,
 };
 
@@ -77,7 +77,7 @@ impl FileSystemTiles {
             TileAtlasData::Animation(_) => None,
             TileAtlasData::GridCorner(v) => v.load_corner(&self.workspace, mask as u32, index as u32).ok(),
             TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask).ok(),
-            TileAtlasData::GridRpgMakerXP(v) => v.load_corner(&self.workspace, mask).ok(),
+            TileAtlasData::GridRpgMakerVX(v) => v.load_corner(&self.workspace, mask).ok(),
             TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
         }
@@ -116,7 +116,7 @@ pub enum TileAtlasData {
     Animation(Box<AnimationFrame>),
     GridCorner(Box<GridCornerAtlas>),
     GridCornerWang(Box<GridCornerWang>),
-    GridRpgMakerXP(Box<GridCornerRMXP>),
+    GridRpgMakerVX(Box<GridCornerRMVXFile>),
     GridEdge(Box<GridEdgeAtlas>),
     GridEdgeWang(Box<GridEdgeWang>),
 }
@@ -128,7 +128,7 @@ impl TileAtlasData {
             TileAtlasData::Animation(v) => v.get_key(),
             TileAtlasData::GridCorner(v) => v.get_key(),
             TileAtlasData::GridCornerWang(v) => v.get_key(),
-            TileAtlasData::GridRpgMakerXP(v) => v.get_key(),
+            TileAtlasData::GridRpgMakerVX(v) => v.get_key(),
             TileAtlasData::GridEdge(v) => v.get_key(),
             TileAtlasData::GridEdgeWang(v) => v.get_key(),
         }

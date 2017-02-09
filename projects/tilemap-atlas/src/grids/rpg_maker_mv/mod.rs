@@ -1,21 +1,16 @@
 use super::*;
+use crate::traits::io_error;
+use std::io::ErrorKind;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GridCornerRMXPFile {
-    key: String,
-    cell_w: u32,
-    cell_h: u32,
-}
-
 pub struct GridCornerRMMV {
     image: RgbaImage,
     cell_w: u32,
     cell_h: u32,
 }
 
-impl GridCornerRMXPFile {
-    /// Create a new tile set from rpg maker atlas.
+impl GridCornerRMMV {
+    /// Create a new [`GridCornerRMMV`] tile set from rpg maker atlas.
     ///
     /// ## Panics
     ///
@@ -26,73 +21,47 @@ impl GridCornerRMXPFile {
     /// ```
     /// use tileset::GridCornerRMVXFile;
     /// ```
-    pub fn new<S>(key: S, width: u32, height: u32) -> Self
+    pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let max_x = x + 4 * w;
+        let max_y = y + 6 * h;
+        if max_x > image.width() || max_y > image.height() {
+            io_error("The image size has out of range", ErrorKind::InvalidInput)?;
+        }
+        // SAFETY: The image has been checked.
+        unsafe { Ok(Self::create(image, (x, y), (w, h))) }
+    }
+    /// Create a new [`GridCornerRMMV`] tile set without check.
+    ///
+    /// # Arguments
+    ///
+    /// * `image`:
+    /// * `(x, y)`:
+    /// * `(w, h)`:
+    ///
+    /// returns: GridCornerRMMV
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tileset::GridCornerRMVXFile;
+    /// ```
+    pub unsafe fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> Self {
+        let image = image::imageops::crop_imm(&image, x, y, w * 4, h * 6).to_image();
+        Self { image, cell_w: w, cell_h: h }
+    }
+    pub fn load<P>(path: P) -> ImageResult<Self>
     where
-        S: ToString,
+        P: AsRef<Path>,
     {
-        Self { key: key.to_string(), cell_w: width, cell_h: height }
-    }
-}
-
-// getters
-impl GridCornerRMXPFile {
-    /// Create a new tile set from rpg maker atlas.
-    ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_key(&self) -> &str {
-        &self.key
-    }
-    /// Create a new tile set from rpg maker atlas.
-    ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_path(&self, root: &Path) -> PathBuf {
-        root.join(&self.key)
-    }
-    /// Create a new tile set from rpg maker atlas.
-    ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
-        Ok(image::open(self.get_path(root))?.to_rgba8())
-    }
-    /// Create a new tile set from rpg maker atlas.
-    ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
-        let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;
-        let image = self.get_image(root)?;
-        view_rpg4x6_cell(&image, mask)
+        let image = image::open(path)?.to_rgba8();
+        let (w, h) = image.dimensions();
+        if w % 4 != 0 || h % 6 != 0 {
+            io_error(
+                "The image width must be a multiple of 4 and the image height must be a multiple of 6",
+                ErrorKind::InvalidInput,
+            )?;
+        }
+        Ok(Self { image, cell_w: w / 4, cell_h: h / 6 })
     }
 }
 

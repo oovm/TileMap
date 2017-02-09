@@ -2,15 +2,20 @@ use super::*;
 use crate::traits::io_error;
 use std::io::ErrorKind;
 
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct GridCornerRMMV {
+/// A corner type tile set used in [RPG Maker VX](), [RPG MakerMV](), [RPG MakerMZ]().
+///
+/// ## Example
+///
+/// ![]()
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub struct GridCornerRMVX {
     image: RgbaImage,
     cell_w: u32,
     cell_h: u32,
 }
 
-impl GridCornerRMMV {
-    /// Create a new [`GridCornerRMMV`] tile set from rpg maker atlas.
+impl GridCornerRMVX {
+    /// Create a new [`GridCornerRMVX`] tile set from rpg maker atlas.
     ///
     /// ## Panics
     ///
@@ -30,7 +35,7 @@ impl GridCornerRMMV {
         // SAFETY: The image has been checked.
         unsafe { Ok(Self::create(image, (x, y), (w, h))) }
     }
-    /// Create a new [`GridCornerRMMV`] tile set without check.
+    /// Create a new [`GridCornerRMVX`] tile set without check.
     ///
     /// # Arguments
     ///
@@ -46,7 +51,7 @@ impl GridCornerRMMV {
     /// use tileset::GridCornerRMVXFile;
     /// ```
     pub unsafe fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> Self {
-        let image = image::imageops::crop_imm(&image, x, y, w * 4, h * 6).to_image();
+        let image = image::imageops::crop_imm(image, x, y, w * 4, h * 6).to_image();
         Self { image, cell_w: w, cell_h: h }
     }
     pub fn load<P>(path: P) -> ImageResult<Self>

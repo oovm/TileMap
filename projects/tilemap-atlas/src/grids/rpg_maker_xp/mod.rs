@@ -8,6 +8,11 @@ pub struct GridCornerRMVXFile {
     cell_h: u32,
 }
 
+/// A corner type tile set used in [RPG Maker 2000](), [RPG Maker 2003](), [RPG Maker XP]().
+///
+/// ## Example
+///
+/// ![]()
 pub struct GridCornerRMXP {
     image: RgbaImage,
     cell_w: u32,

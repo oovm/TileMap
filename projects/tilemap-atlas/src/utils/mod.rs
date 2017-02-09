@@ -1,5 +1,5 @@
 use crate::{GridCompleteAtlas, GridCornerRMVXFile};
-use image::{GenericImageView, ImageResult, RgbaImage};
+use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
 use itertools::Itertools;
 use std::{
     collections::BTreeMap,
@@ -223,6 +223,12 @@ where
     Ok((raw, new_path))
 }
 
+pub(crate) fn save_as_png<P>(image: &RgbaImage, path: P) -> ImageResult<()>
+where
+    P: AsRef<Path>,
+{
+    image::save_buffer_with_format(path, &image, image.width(), image.height(), ColorType::Rgba8, ImageFormat::Png)
+}
 #[test]
 fn test22() {
     println!("{:?}", MaskBuilder::complete_set().map.keys().collect_vec());

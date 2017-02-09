@@ -1,6 +1,5 @@
 #![doc=include_str!("../readme.md")]
-
-extern crate core;
+#![warn(missing_docs)]
 
 mod traits;
 

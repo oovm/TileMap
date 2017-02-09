@@ -15,3 +15,5 @@ use std::path::{Path, PathBuf};
 pub mod complete;
 pub mod edge_wang;
 pub mod rpg_maker_vx;
+use crate::utils::save_as_png;
+use image::{ColorType, ImageFormat};

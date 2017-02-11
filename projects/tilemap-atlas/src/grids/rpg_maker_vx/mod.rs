@@ -1,6 +1,5 @@
 use super::*;
-use crate::traits::io_error;
-use std::io::ErrorKind;
+mod to_complete;
 
 /// A corner type tile set used in [RPG Maker VX](), [RPG MakerMV](), [RPG MakerMZ]().
 ///

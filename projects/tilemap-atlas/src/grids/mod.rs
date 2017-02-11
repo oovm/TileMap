@@ -1,7 +1,7 @@
 pub mod bg_set;
 pub mod corner_set;
 pub mod edge_set;
-use crate::{traits::io_error, GridAtlas};
+use crate::{traits::io_error};
 use image::{GenericImageView, ImageResult, RgbaImage, SubImage};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -16,4 +16,4 @@ pub mod complete;
 pub mod edge_wang;
 pub mod rpg_maker_vx;
 use crate::utils::save_as_png;
-use image::{ColorType, ImageFormat};
+

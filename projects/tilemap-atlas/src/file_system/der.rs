@@ -73,7 +73,7 @@ impl<'i, 'de> Visitor<'de> for VisitorFileSystemTiles<'i> {
         formatter.write_str("except FileSystemTiles {size}")
     }
 
-    fn visit_map<A>(mut self, mut map: A) -> Result<Self::Value, A::Error>
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
     where
         A: MapAccess<'de>,
     {

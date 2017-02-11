@@ -1,12 +1,7 @@
-use image::ImageResult;
-use std::{
-    collections::BTreeMap,
-    fmt::{Display, Formatter},
-    path::Path,
-};
+use std::path::Path;
 use tileset::{
-    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, decompose_image_grid_by_cells},
-    FileSystemTiles, GridCompleteAtlas, GridCornerAtlas, GridCornerWang, TileAtlasData,
+    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, decompose_image_grid_by_cells, MaskBuilder},
+    FileSystemTiles, GridCornerWang, TileAtlasData,
 };
 
 #[test]
@@ -38,11 +33,11 @@ fn test_atlas() {
     convert_rpg4x6(&here.join("tests/rpg4x6/grass.png")).unwrap();
 }
 
-#[test]
-fn test_dep() {
-    let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
-    decompose_image_grid_by_cells(&here.join("tests/atlas1/atlas.png"), 4, 6).unwrap();
-}
+// #[test]
+// fn test_dep() {
+//     let here = Path::new(env!("CARGO_MANIFEST_DIR")).canonicalize().unwrap();
+//     decompose_image_grid_by_cells(&here.join("tests/atlas1/atlas.png"), 4, 6).unwrap();
+// }
 
 // #[test]
 // fn test_edge() {
@@ -77,4 +72,11 @@ fn test_fs() {
 fn debug_cell((x, y): (u32, u32), mask: &[u32]) -> String {
     let s: u32 = mask.iter().map(|i| 2u32.pow(*i)).sum();
     format!("0b{:08b} => ({}, {}),", s, x, y)
+}
+
+#[test]
+fn test22() {
+    println!("{:?}", MaskBuilder::complete_set().masks());
+
+    println!("{}", MaskBuilder::blob7x7_set());
 }

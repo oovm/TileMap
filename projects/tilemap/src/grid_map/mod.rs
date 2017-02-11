@@ -1,8 +1,8 @@
 use std::{
-    collections::{BTreeMap, BTreeSet, VecDeque},
-    sync::{Arc, LockResult, Mutex},
+    collections::{BTreeMap},
+    sync::{Arc},
 };
-use tileset::{GridAtlas, TilesProvider};
+use tileset::{TilesProvider};
 
 /// Shared tile grid atlas.
 pub struct GridTileManager {

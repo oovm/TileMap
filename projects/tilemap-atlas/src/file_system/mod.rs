@@ -82,7 +82,7 @@ impl FileSystemTiles {
             TileAtlasData::GridEdgeWang(_) => None,
         }
     }
-    pub fn get_side_atlas(&self, file: &str, mask: u8) -> Option<TileAtlasData> {
+    pub fn get_side_atlas(&self, file: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(file).map(|a| a.value().clone())
     }
     pub fn insert_atlas(&self, file: &str, data: TileAtlasData) -> ImageResult<()> {

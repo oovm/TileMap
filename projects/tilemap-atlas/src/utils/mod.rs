@@ -1,6 +1,5 @@
-use crate::{GridCompleteAtlas, GridCornerRMVXFile};
+use crate::{GridCompleteAtlas, GridCornerRMVX};
 use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
-use itertools::Itertools;
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
@@ -21,7 +20,7 @@ where
     for row in 0..rows {
         for col in 0..cols {
             let view = image.view(col * cell_width, row * cell_height, cell_width, cell_height);
-            let mut out = dir.join(format!("{}-{}-{}.png", name.to_str().unwrap(), col, row));
+            let out = dir.join(format!("{}-{}-{}.png", name.to_str().unwrap(), col, row));
             view.to_image().save(&out)?;
         }
     }
@@ -54,6 +53,9 @@ impl Display for MaskBuilder {
 impl MaskBuilder {
     pub fn new(x: u32, y: u32) -> MaskBuilder {
         Self { map: BTreeMap::default(), defaults: (x, y) }
+    }
+    pub fn masks(&self) -> Vec<u8> {
+        self.map.keys().copied().collect()
     }
     pub fn has_bits(&mut self, (x, y): (u32, u32), mask: &[u32]) {
         let s: u32 = mask.iter().map(|i| 2u32.pow(*i)).sum();
@@ -203,13 +205,14 @@ where
     new.save(output)
 }
 
+/// Convert a 4x6 grid of tiles into a 4x6 grid of tiles with the RPG Maker VX style
 pub fn convert_rpg4x6<P>(image: P) -> ImageResult<()>
 where
     P: AsRef<Path>,
 {
     let (raw, output) = image_with_new_path(image)?;
-    let new = GridCornerRMVXFile::make_complete(&raw, raw.width() / 4, raw.height() / 6);
-    new.save(output)
+    let rpg = GridCornerRMVX::new(&raw, (0, 0), (raw.width() / 4, raw.height() / 6))?;
+    rpg.as_complete().save(output)
 }
 
 fn image_with_new_path<P>(image: P) -> ImageResult<(RgbaImage, PathBuf)>
@@ -228,10 +231,4 @@ where
     P: AsRef<Path>,
 {
     image::save_buffer_with_format(path, &image, image.width(), image.height(), ColorType::Rgba8, ImageFormat::Png)
-}
-#[test]
-fn test22() {
-    println!("{:?}", MaskBuilder::complete_set().map.keys().collect_vec());
-
-    println!("{}", MaskBuilder::blob7x7_set());
 }

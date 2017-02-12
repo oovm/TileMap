@@ -2,14 +2,6 @@ use super::*;
 
 mod to_complete;
 
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GridCornerRMVXFile {
-    key: String,
-    cell_w: u32,
-    cell_h: u32,
-}
-
 /// A corner type tile set used in [RPG Maker 2000](), [RPG Maker 2003](), [RPG Maker XP]().
 ///
 /// ## Example
@@ -20,9 +12,8 @@ pub struct GridCornerRMXP {
     cell_w: u32,
     cell_h: u32,
 }
-
-impl GridCornerRMVXFile {
-    /// Create a new tile set from rpg maker atlas.
+impl GridCornerRMXP {
+    /// Create a new [`GridCornerRMXP`] tile set from rpg maker atlas.
     ///
     /// ## Panics
     ///
@@ -31,80 +22,67 @@ impl GridCornerRMVXFile {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMVXFile;
+    /// use tileset::GridCornerRMXP;
     /// ```
-    pub fn new(key: &str, width: u32, height: u32) -> Self {
-        Self { key: key.to_string(), cell_w: width, cell_h: height }
-    }
-    pub fn as_standard(&self, key: &str, image: &RgbaImage) -> ImageResult<(GridCornerAtlas, RgbaImage)> {
-        let mut output = RgbaImage::new(self.cell_w * 16, self.cell_h);
-        for i in 0..16 {
-            let view = view_rpg4x6_cell(image, i as u8)?;
-            output.copy_from(&view, i * self.cell_w, 0)?;
+    pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let max_x = x + 6 * w;
+        let max_y = y + 8 * h;
+        if max_x > image.width() || max_y > image.height() {
+            io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        Ok((GridCornerAtlas { key: key.to_string(), cell_w: self.cell_w, cell_h: self.cell_h, count: [1; 16] }, output))
+        let view = image::imageops::crop_imm(image, x, y, w * 6, h * 8);
+        // SAFETY: The image has been checked.
+        unsafe { Ok(Self::create(view.to_image())) }
     }
-}
-
-// getters
-impl GridCornerRMVXFile {
-    /// Create a new tile set from rpg maker atlas.
+    /// Create a new [`GridCornerRMVX`] tile set without check.
     ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
+    /// # Examples
     ///
     /// ```
     /// use tileset::GridCornerRMVXFile;
     /// ```
-    pub fn get_key(&self) -> &str {
-        &self.key
+    pub unsafe fn create(image: RgbaImage) -> Self {
+        let cell_w = image.width() / 6;
+        let cell_h = image.width() / 8;
+        Self { image, cell_w, cell_h }
     }
-    /// Create a new tile set from rpg maker atlas.
+    /// Create the tile set from supported image format, recommend use png.
     ///
-    /// ## Panics
+    /// # Examples
     ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMVX;
+    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
+    /// image.save("assets/grass-vx.png").unwrap();
     /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_path(&self, root: &Path) -> PathBuf {
-        root.join(&self.key)
+    pub fn load<P>(path: P) -> ImageResult<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let image = image::open(path)?.to_rgba8();
+        let (w, h) = image.dimensions();
+        if w % 4 != 0 || h % 6 != 0 {
+            io_error(
+                "The image width must be a multiple of 4 and the image height must be a multiple of 6",
+                ErrorKind::InvalidInput,
+            )?;
+        }
+        Ok(Self { image, cell_w: w / 4, cell_h: h / 6 })
     }
-    /// Create a new tile set from rpg maker atlas.
+    /// Save the tile set image to a png file, remember you need add `.png` suffix.
     ///
-    /// ## Panics
+    /// # Examples
     ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMVX;
+    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
+    /// image.save("assets/grass-vx.png").unwrap();
     /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
-        Ok(image::open(self.get_path(root))?.to_rgba8())
-    }
-    /// Create a new tile set from rpg maker atlas.
-    ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use tileset::GridCornerRMVXFile;
-    /// ```
-    pub fn load_corner(&self, root: &Path, mask: u8) -> ImageResult<RgbaImage> {
-        debug_assert!(mask >= 16, "corner mask {} is not in range [0b0000, 0b1111]", mask);
-        let image = self.get_image(root)?;
-        Ok(view_rpg4x6_cell(&image, mask)?)
+    pub fn save<P>(&self, path: P) -> ImageResult<()>
+    where
+        P: AsRef<Path>,
+    {
+        save_as_png(&self.image, path)
     }
 }
 

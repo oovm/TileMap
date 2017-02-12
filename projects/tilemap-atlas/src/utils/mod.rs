@@ -1,4 +1,4 @@
-use crate::{GridCompleteAtlas, GridCornerRMVX};
+use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridCompleteAtlas, GridCornerRMVX};
 use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
 use std::{
     collections::BTreeMap,
@@ -212,6 +212,16 @@ where
 {
     let (raw, output) = image_with_new_path(image)?;
     let rpg = GridCornerRMVX::new(&raw, (0, 0), (raw.width() / 4, raw.height() / 6))?;
+    rpg.as_complete().save(output)
+}
+
+/// Convert a 4x6 grid of tiles into a 4x6 grid of tiles with the RPG Maker VX style
+pub fn convert_rpg6x8<P>(image: P) -> ImageResult<()>
+where
+    P: AsRef<Path>,
+{
+    let (raw, output) = image_with_new_path(image)?;
+    let rpg = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8))?;
     rpg.as_complete().save(output)
 }
 

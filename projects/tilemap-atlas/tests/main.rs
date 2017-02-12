@@ -1,6 +1,6 @@
 use std::path::Path;
 use tileset::{
-    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, decompose_image_grid_by_cells, MaskBuilder},
+    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, convert_rpg6x8, decompose_image_grid_by_cells, MaskBuilder},
     FileSystemTiles, GridCornerWang, TileAtlasData,
 };
 
@@ -31,6 +31,7 @@ fn test_atlas() {
     // corner 4x4
     convert_rpg4x6(&here.join("tests/rpg4x6/atlas.png")).unwrap();
     convert_rpg4x6(&here.join("tests/rpg4x6/grass.png")).unwrap();
+    convert_rpg6x8(&here.join("tests/rpg6x8/grass.png")).unwrap();
 }
 
 // #[test]

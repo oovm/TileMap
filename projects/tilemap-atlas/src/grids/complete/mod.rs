@@ -73,8 +73,8 @@ impl GridCompleteAtlas {
     ///
     /// ```no_run
     /// # use tileset::GridCompleteAtlas;
-    /// let image = GridCompleteAtlas::load("assets/standard/grass.png").unwrap();
-    /// image.save("assets/standard/grass.png").unwrap();
+    /// let image = GridCompleteAtlas::load("assets/grass.png").unwrap();
+    /// image.save("assets/grass.png").unwrap();
     /// ```
     pub fn save<P>(&self, path: P) -> ImageResult<()>
     where

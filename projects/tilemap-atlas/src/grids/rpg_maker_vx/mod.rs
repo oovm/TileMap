@@ -23,7 +23,7 @@ impl GridCornerRMVX {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMVXFile;
+    /// # use tileset::GridCornerRMVX;
     /// ```
     pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
         let max_x = x + 4 * w;
@@ -31,28 +31,31 @@ impl GridCornerRMVX {
         if max_x > image.width() || max_y > image.height() {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
+        let view = image::imageops::crop_imm(image, x, y, w * 4, h * 6);
         // SAFETY: The image has been checked.
-        unsafe { Ok(Self::create(image, (x, y), (w, h))) }
+        unsafe { Ok(Self::create(view.to_image())) }
     }
     /// Create a new [`GridCornerRMVX`] tile set without check.
-    ///
-    /// # Arguments
-    ///
-    /// * `image`:
-    /// * `(x, y)`:
-    /// * `(w, h)`:
-    ///
-    /// returns: GridCornerRMMV
     ///
     /// # Examples
     ///
     /// ```
-    /// use tileset::GridCornerRMVXFile;
+    /// # use tileset::GridCornerRMVX;
     /// ```
-    pub unsafe fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> Self {
-        let image = image::imageops::crop_imm(image, x, y, w * 4, h * 6).to_image();
-        Self { image, cell_w: w, cell_h: h }
+    pub unsafe fn create(image: RgbaImage) -> Self {
+        let cell_w = image.width() / 4;
+        let cell_h = image.height() / 6;
+        Self { image, cell_w, cell_h }
     }
+    /// Create the tile set from supported image format, recommend use png.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMVX;
+    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
+    /// image.save("assets/grass-vx.png").unwrap();
+    /// ```
     pub fn load<P>(path: P) -> ImageResult<Self>
     where
         P: AsRef<Path>,
@@ -66,6 +69,21 @@ impl GridCornerRMVX {
             )?;
         }
         Ok(Self { image, cell_w: w / 4, cell_h: h / 6 })
+    }
+    /// Save the tile set image to a png file, remember you need add `.png` suffix.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMVX;
+    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
+    /// image.save("assets/grass-vx.png").unwrap();
+    /// ```
+    pub fn save<P>(&self, path: P) -> ImageResult<()>
+    where
+        P: AsRef<Path>,
+    {
+        save_as_png(&self.image, path)
     }
 }
 

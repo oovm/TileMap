@@ -1,6 +1,6 @@
 use crate::{
-    traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerRMXP, GridCornerWang, GridEdgeAtlas, GridEdgeWang,
-    GridSimpleAtlas, TilesProvider,
+    traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas,
+    TilesProvider,
 };
 
 use crate::utils::grid_corner_mask;

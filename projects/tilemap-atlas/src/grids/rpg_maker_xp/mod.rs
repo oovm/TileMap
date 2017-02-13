@@ -22,7 +22,9 @@ impl GridCornerRMXP {
     /// ## Example
     ///
     /// ```
-    /// use tileset::GridCornerRMXP;
+    /// # use tileset::GridCornerRMXP;
+    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
+    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 4, raw.height() / 6)).unwrap();
     /// ```
     pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
         let max_x = x + 6 * w;
@@ -39,11 +41,13 @@ impl GridCornerRMXP {
     /// # Examples
     ///
     /// ```
-    /// use tileset::GridCornerRMVXFile;
+    /// # use tileset::GridCornerRMXP;
+    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
+    /// let image = unsafe { GridCornerRMXP::create(raw) };
     /// ```
     pub unsafe fn create(image: RgbaImage) -> Self {
         let cell_w = image.width() / 6;
-        let cell_h = image.width() / 8;
+        let cell_h = image.height() / 8;
         Self { image, cell_w, cell_h }
     }
     /// Create the tile set from supported image format, recommend use png.

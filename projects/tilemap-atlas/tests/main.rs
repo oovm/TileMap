@@ -28,10 +28,11 @@ fn test_atlas() {
     convert_edge4x4(&here.join("tests/edge4x4/circuit.png")).unwrap();
     convert_edge4x4(&here.join("tests/edge4x4/laser.png")).unwrap();
     convert_edge4x4(&here.join("tests/edge4x4/octal.png")).unwrap();
-    // corner 4x4
+    // corner rpg maker
     convert_rpg4x6(&here.join("tests/rpg4x6/atlas.png")).unwrap();
     convert_rpg4x6(&here.join("tests/rpg4x6/grass.png")).unwrap();
     convert_rpg6x8(&here.join("tests/rpg6x8/grass.png")).unwrap();
+    convert_rpg6x8(&here.join("tests/rpg6x8/forest.png")).unwrap();
 }
 
 // #[test]
@@ -68,11 +69,6 @@ fn test_fs() {
     pvd.insert_atlas("atlas1", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("a", 32, 32)))).unwrap();
     pvd.insert_atlas("atlas2", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("b", 32, 32)))).unwrap();
     pvd.insert_atlas("atlas3", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("c", 32, 32)))).unwrap();
-}
-
-fn debug_cell((x, y): (u32, u32), mask: &[u32]) -> String {
-    let s: u32 = mask.iter().map(|i| 2u32.pow(*i)).sum();
-    format!("0b{:08b} => ({}, {}),", s, x, y)
 }
 
 #[test]

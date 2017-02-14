@@ -51,22 +51,27 @@ impl Display for MaskBuilder {
 }
 
 impl MaskBuilder {
+    /// Create a new mask set
     pub fn new(x: u32, y: u32) -> MaskBuilder {
         Self { map: BTreeMap::default(), defaults: (x, y) }
     }
+    /// Get all of the masks
     pub fn masks(&self) -> Vec<u8> {
         self.map.keys().copied().collect()
     }
+    /// Set mask by bits
     pub fn has_bits(&mut self, (x, y): (u32, u32), mask: &[u32]) {
         let s: u32 = mask.iter().map(|i| 2u32.pow(*i)).sum();
         self.has_mask((x, y), s as u8);
     }
+    /// Set mask by byte
     pub fn has_mask(&mut self, (x, y): (u32, u32), mask: u8) {
         let pop = self.map.insert(mask, (x, y));
         if let Some((i, j)) = pop {
             panic!("duplicate mask {}: new {:?}, old {:?}", mask, (x, y), (i, j))
         }
     }
+    /// The masks of complete set
     pub fn complete_set() -> Self {
         let mut masks = MaskBuilder::new(1, 4);
         // part1
@@ -123,6 +128,7 @@ impl MaskBuilder {
 
         masks
     }
+    /// The masks of blob set type A
     pub fn blob7x7_set() -> Self {
         let mut masks = MaskBuilder::new(1, 1);
         // part1
@@ -185,6 +191,7 @@ impl MaskBuilder {
     }
 }
 
+/// Convert a 7x7 blob type A tile set to complete set atlas
 pub fn convert_blob7x7a<P>(image: P) -> ImageResult<()>
 where
     P: AsRef<Path>,
@@ -196,6 +203,7 @@ where
     new.save(path.with_file_name(new_name))
 }
 
+/// Convert a 4x4 corner tile set to complete set atlas
 pub fn convert_edge4x4<P>(image: P) -> ImageResult<()>
 where
     P: AsRef<Path>,
@@ -205,7 +213,7 @@ where
     new.save(output)
 }
 
-/// Convert a 4x6 grid of tiles into a 4x6 grid of tiles with the RPG Maker VX style
+/// Convert a 4x6 rpg tile set to complete set atlas
 pub fn convert_rpg4x6<P>(image: P) -> ImageResult<()>
 where
     P: AsRef<Path>,
@@ -215,7 +223,7 @@ where
     rpg.as_complete().save(output)
 }
 
-/// Convert a 4x6 grid of tiles into a 4x6 grid of tiles with the RPG Maker VX style
+/// Convert a 6x8 rpg tile set to complete set atlas
 pub fn convert_rpg6x8<P>(image: P) -> ImageResult<()>
 where
     P: AsRef<Path>,
@@ -236,6 +244,7 @@ where
     Ok((raw, new_path))
 }
 
+/// force save image as png
 pub(crate) fn save_as_png<P>(image: &RgbaImage, path: P) -> ImageResult<()>
 where
     P: AsRef<Path>,

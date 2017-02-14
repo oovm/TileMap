@@ -1,6 +1,6 @@
 use std::path::Path;
 use tileset::{
-    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, convert_rpg6x8, decompose_image_grid_by_cells, MaskBuilder},
+    utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, convert_rpg6x8, MaskBuilder},
     FileSystemTiles, GridCornerWang, TileAtlasData,
 };
 

@@ -1,5 +1,6 @@
 #![doc=include_str!("../readme.md")]
 #![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
 
 mod traits;
 

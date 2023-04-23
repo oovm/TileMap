@@ -24,25 +24,29 @@ For tiles in non-standard cases, conversion functions are provided.
 
 - [GridCornerAtlas::from_rpg_maker_xp](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
 
-![](https://github.com/oovm/TileMap/blob/dev/projects/tilemap-atlas/tests/rpg4x6/atlas.png)
-
-
+![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/tests/rpg6x8/forest.png)
 
 #### RPG Maker MV tiles
 
 - [GridCornerAtlas::from_rpg_maker_mv](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
 
+![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/tests/rpg4x6/water.png)
+
 #### Tiny tiles
 
 - [from_tiny](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
+
+![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/tests/rpg4x6/water.png)
 
 #### Wang tiles
 
 - [GridCornerAtlas::from_wang](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
 
----
+![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/tests/rpg4x6/water.png)
 
 - [GridEdgeAtlas::from_wang](https://docs.rs/tileset/latest/tileset/struct.GridCornerAtlas.html#method.from_rpg_maker_xp)
+
+![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/tests/rpg4x6/water.png)
 
 ## Packed Format
 

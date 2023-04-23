@@ -1,7 +1,4 @@
-use crate::{
-    traits::io_error, AnimationFrame, GridCornerAtlas, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas,
-    TilesProvider,
-};
+use crate::{traits::io_error, AnimationFrame, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas, TilesProvider};
 
 use crate::utils::grid_corner_mask;
 use dashmap::DashMap;
@@ -75,7 +72,6 @@ impl FileSystemTiles {
         match self.atlas.get(name)?.value() {
             TileAtlasData::SimpleSet(_) => None,
             TileAtlasData::Animation(_) => None,
-            TileAtlasData::GridCorner(v) => v.load_corner(&self.workspace, mask as u32, index as u32).ok(),
             TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask).ok(),
             TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
@@ -113,7 +109,6 @@ pub enum TileAtlasKind {
 pub enum TileAtlasData {
     SimpleSet(Box<GridSimpleAtlas>),
     Animation(Box<AnimationFrame>),
-    GridCorner(Box<GridCornerAtlas>),
     GridCornerWang(Box<GridCornerWang>),
     GridEdge(Box<GridEdgeAtlas>),
     GridEdgeWang(Box<GridEdgeWang>),
@@ -124,7 +119,6 @@ impl TileAtlasData {
         match self {
             TileAtlasData::SimpleSet(v) => v.get_key(),
             TileAtlasData::Animation(v) => v.get_key(),
-            TileAtlasData::GridCorner(v) => v.get_key(),
             TileAtlasData::GridCornerWang(v) => v.get_key(),
             TileAtlasData::GridEdge(v) => v.get_key(),
             TileAtlasData::GridEdgeWang(v) => v.get_key(),

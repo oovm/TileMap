@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::check_image_multiple;
 
 mod to_complete;
 
@@ -7,82 +8,53 @@ mod to_complete;
 /// ## Example
 ///
 /// ![]()
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerRMXP {
     image: RgbaImage,
-    cell_w: u32,
-    cell_h: u32,
 }
 
-impl GridCornerRMXP {
-    /// Create a new tile set from rpg maker xp atlas.
+impl GridAtlas for GridCornerRMXP {
+    unsafe fn new(image: RgbaImage) -> Self {
+        Self { image }
+    }
+    /// Create a complete tile set without check.
     ///
-    /// ## Example
+    /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
-    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// # use tileset::{GridAtlas, GridCornerWang};
+    /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+    /// let tile_set =
+    ///     GridCornerWang::create(&image, (0, 0), (image.width() / 6, image.height() / 8)).unwrap();
     /// ```
-    pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
-        let max_x = x + 6 * w;
-        let max_y = y + 8 * h;
-        if max_x > image.width() || max_y > image.height() {
+    fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let (image_w, image_h) = image.dimensions();
+        if x + w * 6 > image_w || y + h * 8 > image_h {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        let view = image::imageops::crop_imm(image, x, y, w * 6, h * 8);
+        let view = image.view(x, y, w * 6, h * 8);
         // SAFETY: The image has been checked.
-        unsafe { Ok(Self::create(view.to_image())) }
+        unsafe { Ok(Self::new(view.to_image())) }
     }
-    /// Create a new tile set from image without check.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
-    /// let image = unsafe { GridCornerRMXP::create(raw) };
-    /// ```
-    pub unsafe fn create(image: RgbaImage) -> Self {
-        let cell_w = image.width() / 6;
-        let cell_h = image.height() / 8;
-        Self { image, cell_w, cell_h }
+
+    fn get_cell_size(&self) -> (u32, u32) {
+        (self.image.width() / 6, self.image.height() / 8)
     }
-    /// Create the tile set from supported image format, recommend use png.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let image = GridCornerRMXP::load("assets/grass-xp.png").unwrap();
-    /// image.save("assets/grass-xp.png").unwrap();
-    /// ```
-    pub fn load<P>(path: P) -> ImageResult<Self>
+
+    fn get_image(&self) -> &RgbaImage {
+        &self.image
+    }
+
+    fn get_by_mask(&self, _: u8) -> RgbaImage {
+        todo!()
+    }
+
+    fn load<P>(path: P) -> ImageResult<Self>
     where
         P: AsRef<Path>,
     {
         let image = image::open(path)?.to_rgba8();
-        let (w, h) = image.dimensions();
-        if w % 6 != 0 || h % 8 != 0 {
-            io_error(
-                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
-                ErrorKind::InvalidInput,
-            )?;
-        }
-        Ok(Self { image, cell_w: w / 6, cell_h: h / 8 })
-    }
-    /// Save the tile set image to a png file, remember you need add `.png` suffix.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let image = GridCornerRMXP::load("assets/grass-xp.png").unwrap();
-    /// image.save("assets/grass-xp.png").unwrap();
-    /// ```
-    pub fn save<P>(&self, path: P) -> ImageResult<()>
-    where
-        P: AsRef<Path>,
-    {
-        save_as_png(&self.image, path)
+        check_image_multiple(&image, 6, 8)?;
+        Ok(Self { image })
     }
 }

@@ -9,58 +9,45 @@ mod to_complete;
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerRMVX {
     image: RgbaImage,
-    cell_w: u32,
-    cell_h: u32,
 }
 
-impl GridCornerRMVX {
-    /// Create a new [`GridCornerRMVX`] tile set from rpg maker atlas.
+impl GridAtlas for GridCornerRMVX {
+    unsafe fn new(image: RgbaImage) -> Self {
+        Self { image }
+    }
+    /// Create a complete tile set without check.
     ///
-    /// ## Panics
-    ///
-    /// Panics if the image width is not a multiple of 4 or the image height is not a multiple of 6.
-    ///
-    /// ## Example
+    /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let raw = image::open("assets/grass-vx.png").unwrap().to_rgba8();
-    /// let image = GridCornerRMVX::new(&raw, (0, 0), (raw.width() / 4, raw.height() / 6)).unwrap();
+    /// # use tileset::{GridAtlas, GridCornerWang};
+    /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+    /// let tile_set =
+    ///     GridCornerWang::create(&image, (0, 0), (image.width() / 4, image.height() / 6)).unwrap();
     /// ```
-    pub fn new(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
-        let max_x = x + 4 * w;
-        let max_y = y + 6 * h;
-        if max_x > image.width() || max_y > image.height() {
+    fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let (image_w, image_h) = image.dimensions();
+        if x + w * 4 > image_w || y + h * 6 > image_h {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        let view = image::imageops::crop_imm(image, x, y, w * 4, h * 6);
+        let view = image.view(x, y, w * 4, h * 6);
         // SAFETY: The image has been checked.
-        unsafe { Ok(Self::create(view.to_image())) }
+        unsafe { Ok(Self::new(view.to_image())) }
     }
-    /// Create a new [`GridCornerRMVX`] tile set without check.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let raw = image::open("assets/grass-vx.png").unwrap().to_rgba8();
-    /// let image = unsafe { GridCornerRMVX::create(raw) };
-    /// ```
-    pub unsafe fn create(image: RgbaImage) -> Self {
-        let cell_w = image.width() / 4;
-        let cell_h = image.height() / 6;
-        Self { image, cell_w, cell_h }
+
+    fn get_cell_size(&self) -> (u32, u32) {
+        (self.image.width() / 4, self.image.height() / 6)
     }
-    /// Create the tile set from supported image format, recommend use png.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
-    /// image.save("assets/grass-vx.png").unwrap();
-    /// ```
-    pub fn load<P>(path: P) -> ImageResult<Self>
+
+    fn get_image(&self) -> &RgbaImage {
+        &self.image
+    }
+
+    fn get_by_mask(&self, mask: u8) -> RgbaImage {
+        todo!("{}", mask)
+    }
+
+    fn load<P>(path: P) -> ImageResult<Self>
     where
         P: AsRef<Path>,
     {
@@ -68,25 +55,10 @@ impl GridCornerRMVX {
         let (w, h) = image.dimensions();
         if w % 4 != 0 || h % 6 != 0 {
             io_error(
-                "The image width must be a multiple of 4 and the image height must be a multiple of 6",
+                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
                 ErrorKind::InvalidInput,
             )?;
         }
-        Ok(Self { image, cell_w: w / 4, cell_h: h / 6 })
-    }
-    /// Save the tile set image to a png file, remember you need add `.png` suffix.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let image = GridCornerRMVX::load("assets/grass-vx.png").unwrap();
-    /// image.save("assets/grass-vx.png").unwrap();
-    /// ```
-    pub fn save<P>(&self, path: P) -> ImageResult<()>
-    where
-        P: AsRef<Path>,
-    {
-        save_as_png(&self.image, path)
+        Ok(Self { image })
     }
 }

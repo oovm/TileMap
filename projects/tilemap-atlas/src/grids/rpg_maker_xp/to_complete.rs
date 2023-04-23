@@ -1,5 +1,10 @@
 use super::*;
-use crate::{GridCompleteAtlas, GridCornerRMVX};
+
+impl From<GridCornerRMXP> for GridCompleteAtlas {
+    fn from(rpg: GridCornerRMXP) -> Self {
+        rpg.as_complete()
+    }
+}
 
 impl GridCornerRMXP {
     /// Returns a new `GridCompleteAtlas` from the current `GridCornerRMVX`.
@@ -14,8 +19,8 @@ impl GridCornerRMXP {
     /// rpg.as_complete().save("assets/rpg4x6-std.png").unwrap();
     /// ```
     pub fn as_rpg_maker_vx(&self) -> GridCornerRMVX {
-        let w = self.cell_w * 2;
-        let h = self.cell_h * 2;
+        let w = self.get_cell_size().0 * 2;
+        let h = self.get_cell_size().1 * 2;
         let mut output = RgbaImage::new(w * 2, h * 3);
         for i in 0..2 {
             for j in 0..3 {
@@ -24,7 +29,7 @@ impl GridCornerRMXP {
                 output.copy_from(&*view, i * w, j * h).ok();
             }
         }
-        unsafe { GridCornerRMVX::create(output) }
+        unsafe { GridCornerRMVX::new(output) }
     }
     /// Returns a new `GridCompleteAtlas` from the current `GridCornerRMVX`.
     ///

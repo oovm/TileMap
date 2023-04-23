@@ -1,6 +1,12 @@
 use super::*;
 use crate::GridAtlas;
 
+impl From<GridCornerRMVX> for GridCompleteAtlas {
+    fn from(rpg: GridCornerRMVX) -> Self {
+        rpg.as_complete()
+    }
+}
+
 impl GridCornerRMVX {
     /// Returns a new `GridCompleteAtlas` from the current `GridCornerRMVX`.
     ///
@@ -14,8 +20,7 @@ impl GridCornerRMVX {
     pub fn as_complete(&self) -> GridCompleteAtlas {
         const C: u32 = 24;
         const L: u32 = 8;
-        let w = self.cell_w;
-        let h = self.cell_h;
+        let (w, h) = self.get_cell_size();
         let mut output = RgbaImage::new(w * C, h * L);
         for i in 0..C {
             for j in 0..L {

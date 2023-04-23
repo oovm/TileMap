@@ -79,7 +79,7 @@ fn edge_to_complete((x, y): (u32, u32)) -> (u32, u32) {
     }
 }
 
-fn complete_sub_image(mask: u8) -> (u32, u32) {
+pub(super) fn complete_sub_image(mask: u8) -> (u32, u32) {
     match mask {
         0b00000000 => (10, 1),
         0b00000001 => (0, 2),

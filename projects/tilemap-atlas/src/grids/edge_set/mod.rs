@@ -1,4 +1,5 @@
 use super::*;
+mod as_complete;
 
 /// A edge tile atlas for gridded maps
 ///

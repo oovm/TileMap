@@ -1,5 +1,6 @@
 use super::*;
 use crate::GridAtlas;
+mod as_complete;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerWang {

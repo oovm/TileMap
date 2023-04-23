@@ -1,4 +1,4 @@
-use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridCompleteAtlas, GridCornerRMVX};
+use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridAtlas, GridCompleteAtlas, GridCornerRMVX};
 use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
 use std::{
     collections::BTreeMap,

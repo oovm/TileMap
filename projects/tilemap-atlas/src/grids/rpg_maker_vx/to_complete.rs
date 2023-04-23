@@ -1,4 +1,5 @@
 use super::*;
+use crate::GridAtlas;
 
 impl GridCornerRMVX {
     /// Returns a new `GridCompleteAtlas` from the current `GridCornerRMVX`.
@@ -6,7 +7,7 @@ impl GridCornerRMVX {
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMVX;
+    /// # use tileset::{GridAtlas, GridCornerRMVX};
     /// let rpg = GridCornerRMVX::load("assets/rpg4x6.png").unwrap();
     /// rpg.as_complete().save("assets/rpg4x6-std.png").unwrap();
     /// ```
@@ -24,7 +25,7 @@ impl GridCornerRMVX {
             }
         }
         // SAFETY: output image definitely has the correct size
-        unsafe { GridCompleteAtlas::create(output) }
+        unsafe { GridCompleteAtlas::new(output) }
     }
 }
 

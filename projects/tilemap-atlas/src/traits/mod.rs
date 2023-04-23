@@ -7,7 +7,7 @@ use std::{
     path::Path,
 };
 
-use crate::utils::save_as_png;
+use crate::{utils::save_as_png, GridCompleteAtlas};
 use rand_core::RngCore;
 
 /// A manager that can dynamically determine the required tiles.
@@ -16,6 +16,7 @@ pub trait TilesProvider {}
 pub trait GridAtlas
 where
     Self: Sized + Clone + Send + Sync,
+    GridCompleteAtlas: From<Self>,
 {
     /// Create a new tile set from rpg maker xp atlas.
     ///
@@ -75,7 +76,10 @@ where
     /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
     /// image.save("assets/standard/grass.png").unwrap();
     /// ```
-    fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage;
+    fn get_by_corner(&self, ru: bool, rd: bool, ld: bool, lu: bool) -> RgbaImage {
+        let mask = (ru as u8) << 1 | (rd as u8) << 3 | (ld as u8) << 5 | (lu as u8) << 7;
+        self.get_by_mask(mask)
+    }
     /// Create a new tile set from rpg maker xp atlas.
     ///
     /// # Arguments
@@ -94,7 +98,10 @@ where
     /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
     /// image.save("assets/standard/grass.png").unwrap();
     /// ```
-    fn get_by_side(&self, r: bool, u: bool, l: bool, d: bool) -> RgbaImage;
+    fn get_by_side(&self, u: bool, r: bool, d: bool, l: bool) -> RgbaImage {
+        let mask = (u as u8) << 0 | (r as u8) << 2 | (d as u8) << 4 | (l as u8) << 6;
+        self.get_by_mask(mask)
+    }
     /// Create a new tile set from rpg maker xp atlas.
     ///
     /// # Arguments

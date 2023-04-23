@@ -3,7 +3,7 @@ use crate::{traits::io_error, AnimationFrame, GridCornerWang, GridEdgeAtlas, Gri
 use crate::utils::grid_corner_mask;
 use dashmap::DashMap;
 use image::{ImageResult, RgbaImage};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::ser::PrettyFormatter;
 use std::{
     fs::{create_dir_all, File},
@@ -72,7 +72,7 @@ impl FileSystemTiles {
         match self.atlas.get(name)?.value() {
             TileAtlasData::SimpleSet(_) => None,
             TileAtlasData::Animation(_) => None,
-            TileAtlasData::GridCornerWang(v) => v.load_corner(&self.workspace, mask).ok(),
+            TileAtlasData::GridCornerWang(v) => Some(v.get_by_mask(mask)),
             TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
         }
@@ -104,8 +104,6 @@ pub enum TileAtlasKind {
 }
 
 #[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[serde(tag = "type")]
 pub enum TileAtlasData {
     SimpleSet(Box<GridSimpleAtlas>),
     Animation(Box<AnimationFrame>),
@@ -114,12 +112,29 @@ pub enum TileAtlasData {
     GridEdgeWang(Box<GridEdgeWang>),
 }
 
+impl Serialize for TileAtlasData {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        todo!()
+    }
+}
+impl<'de> Deserialize<'de> for TileAtlasData {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        todo!()
+    }
+}
+
 impl TileAtlasData {
     pub fn get_name(&self) -> &str {
         match self {
             TileAtlasData::SimpleSet(v) => v.get_key(),
             TileAtlasData::Animation(v) => v.get_key(),
-            TileAtlasData::GridCornerWang(v) => v.get_key(),
+            TileAtlasData::GridCornerWang(v) => todo!(),
             TileAtlasData::GridEdge(v) => v.get_key(),
             TileAtlasData::GridEdgeWang(v) => v.get_key(),
         }

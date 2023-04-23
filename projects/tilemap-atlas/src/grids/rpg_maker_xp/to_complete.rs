@@ -14,9 +14,9 @@ impl GridCornerRMXP {
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let rpg = GridCornerRMVX::load("assets/rpg4x6.png").unwrap();
-    /// rpg.as_complete().save("assets/rpg4x6-std.png").unwrap();
+    /// # use tileset::{GridAtlas, GridCornerRMXP};
+    /// let rpg = GridCornerRMXP::load("assets/rpg4x6.png").unwrap();
+    /// rpg.as_rpg_maker_vx().save("assets/rpg4x6-std.png").unwrap();
     /// ```
     pub fn as_rpg_maker_vx(&self) -> GridCornerRMVX {
         let w = self.get_cell_size().0 * 2;
@@ -38,8 +38,8 @@ impl GridCornerRMXP {
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMVX;
-    /// let rpg = GridCornerRMVX::load("assets/rpg4x6.png").unwrap();
+    /// # use tileset::{GridAtlas, GridCornerRMXP};
+    /// let rpg = GridCornerRMXP::load("assets/rpg4x6.png").unwrap();
     /// rpg.as_complete().save("assets/rpg4x6-std.png").unwrap();
     /// ```
     pub fn as_complete(&self) -> GridCompleteAtlas {

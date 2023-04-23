@@ -1,5 +1,4 @@
 use super::*;
-use crate::utils::check_image_multiple;
 
 mod to_complete;
 

@@ -42,6 +42,7 @@ where
 /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
 /// let size = raw.get_cell_size();
 /// ```
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct AnimationSlice {}
 
 /// Create a new animation slice from image.

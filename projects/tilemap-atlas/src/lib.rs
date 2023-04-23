@@ -1,6 +1,7 @@
 #![doc=include_str!("../readme.md")]
 #![warn(missing_docs)]
-#![warn(missing_doc_code_examples)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_copy_implementations)]
 
 mod traits;
 

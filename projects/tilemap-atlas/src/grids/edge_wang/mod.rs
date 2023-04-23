@@ -4,14 +4,6 @@ use crate::utils::check_image_multiple;
 mod as_complete;
 
 /// Create a complete tile set without check.
-///
-/// # Examples
-///
-/// ```no_run
-/// # use tileset::GridCompleteAtlas;
-/// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
-/// let tile_set = unsafe { GridCompleteAtlas::create(image) };
-/// ```
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridEdgeWang {
     image: RgbaImage,

@@ -13,11 +13,40 @@ use rand_core::RngCore;
 /// A manager that can dynamically determine the required tiles.
 pub trait TilesProvider {}
 
-pub trait GridAtlas {
-    fn new(image: RgbaImage) -> ImageResult<Self>
-    where
-        Self: Sized;
-    fn cell_size(&self) -> u32;
+pub trait GridAtlas
+where
+    Self: Sized,
+{
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMXP;
+    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
+    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// ```
+    fn new(image: RgbaImage);
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMXP;
+    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
+    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// ```
+    fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self>;
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::GridCornerRMXP;
+    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
+    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// ```
+    fn get_cell_size(&self) -> u32;
 
     fn get_image(&self) -> &RgbaImage;
 
@@ -44,7 +73,10 @@ pub trait GridAtlas {
     where
         P: AsRef<Path>,
     {
-        Self::new(image::open(path)?.to_rgba8())
+        let image = image::open(path)?.to_rgba8();
+        let (w, h) = image.dimensions();
+        let (c, r) = Self::GRIDS;
+        Self::create(&image, (0, 0), (w / c, h / r))
     }
     /// Save the tile set image to a png file, remember you need add `.png` suffix.
     ///

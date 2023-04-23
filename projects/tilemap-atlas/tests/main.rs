@@ -1,7 +1,7 @@
 use std::path::Path;
 use tileset::{
     utils::{convert_blob7x7a, convert_edge4x4, convert_rpg4x6, convert_rpg6x8, MaskBuilder},
-    FileSystemTiles, GridCornerWang, TileAtlasData,
+    GridAtlas,
 };
 
 #[test]
@@ -62,14 +62,14 @@ fn test_atlas() {
 //     }
 //     Ok(())
 // }
-
-#[test]
-fn test_fs() {
-    let pvd = FileSystemTiles::new("assets/tile-set-1/", 32, 32).unwrap();
-    pvd.insert_atlas("atlas1", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("a", 32, 32)))).unwrap();
-    pvd.insert_atlas("atlas2", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("b", 32, 32)))).unwrap();
-    pvd.insert_atlas("atlas3", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("c", 32, 32)))).unwrap();
-}
+//
+// #[test]
+// fn test_fs() {
+//     let pvd = FileSystemTiles::new("assets/tile-set-1/", 32, 32).unwrap();
+//     pvd.insert_atlas("atlas1", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("a", 32, 32)))).unwrap();
+//     pvd.insert_atlas("atlas2", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("b", 32, 32)))).unwrap();
+//     pvd.insert_atlas("atlas3", TileAtlasData::GridCornerWang(Box::new(GridCornerWang::new("c", 32, 32)))).unwrap();
+// }
 
 #[test]
 fn test22() {

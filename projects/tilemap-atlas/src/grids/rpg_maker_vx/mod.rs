@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::check_image_multiple;
 mod to_complete;
 
 /// A corner type tile set used in [RPG Maker VX](), [RPG MakerMV](), [RPG MakerMZ]().
@@ -52,13 +53,7 @@ impl GridAtlas for GridCornerRMVX {
         P: AsRef<Path>,
     {
         let image = image::open(path)?.to_rgba8();
-        let (w, h) = image.dimensions();
-        if w % 4 != 0 || h % 6 != 0 {
-            io_error(
-                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
-                ErrorKind::InvalidInput,
-            )?;
-        }
+        check_image_multiple(&image, 4, 6)?;
         Ok(Self { image })
     }
 }

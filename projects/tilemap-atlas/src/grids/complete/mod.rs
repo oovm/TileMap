@@ -12,15 +12,11 @@ mod convert;
 #[derive(Clone)]
 pub struct GridCompleteAtlas {
     image: RgbaImage,
-    cell_w: u32,
-    cell_h: u32,
 }
 
 impl GridAtlas for GridCompleteAtlas {
     unsafe fn new(image: RgbaImage) -> Self {
-        let cell_w = image.width() / 12;
-        let cell_h = image.height() / 4;
-        Self { image, cell_w, cell_h }
+        Self { image }
     }
 
     /// Create a complete tile set without check.
@@ -44,7 +40,7 @@ impl GridAtlas for GridCompleteAtlas {
     }
 
     fn get_cell_size(&self) -> (u32, u32) {
-        (self.cell_w, self.cell_h)
+        (self.image.width() / 12, self.image.height() / 4)
     }
 
     fn get_image(&self) -> &RgbaImage {
@@ -52,8 +48,9 @@ impl GridAtlas for GridCompleteAtlas {
     }
 
     fn get_by_mask(&self, mask: u8) -> RgbaImage {
+        let (w, h) = self.get_cell_size();
         let (i, j) = convert::complete_sub_image(mask);
-        let view = self.image.view(i * self.cell_w, j * self.cell_h, self.cell_w, self.cell_h);
+        let view = self.image.view(i * w, j * h, w, h);
         view.to_image()
     }
 
@@ -62,6 +59,7 @@ impl GridAtlas for GridCompleteAtlas {
         P: AsRef<Path>,
     {
         let image = image::open(path)?.to_rgba8();
-        Self::create(&image, (0, 0), (image.width() / 12, image.height() / 4))
+        check_image_multiple(&image, 12, 4)?;
+        Ok(Self { image })
     }
 }

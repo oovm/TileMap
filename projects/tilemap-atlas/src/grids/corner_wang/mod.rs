@@ -1,5 +1,5 @@
 use super::*;
-use crate::GridAtlas;
+
 mod as_complete;
 
 /// Create a complete tile set without check.
@@ -71,13 +71,7 @@ impl GridAtlas for GridCornerWang {
         P: AsRef<Path>,
     {
         let image = image::open(path)?.to_rgba8();
-        let (w, h) = image.dimensions();
-        if w % 4 != 0 || h % 4 != 0 {
-            io_error(
-                "The image width must be a multiple of 4 and the image height must be a multiple of 4",
-                ErrorKind::InvalidInput,
-            )?;
-        }
+        check_image_multiple(&image, 4, 4)?;
         Ok(Self { image })
     }
 }

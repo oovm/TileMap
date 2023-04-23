@@ -5,7 +5,10 @@ pub mod edge_set;
 pub mod edge_wang;
 pub mod rpg_maker_vx;
 pub mod rpg_maker_xp;
-use crate::{utils::io_error, GridAtlas, GridCompleteAtlas, GridCornerRMVX};
+use crate::{
+    utils::{check_image_multiple, io_error},
+    GridAtlas, GridCompleteAtlas, GridCornerRMVX,
+};
 use image::{GenericImage, GenericImageView, ImageResult, RgbaImage};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

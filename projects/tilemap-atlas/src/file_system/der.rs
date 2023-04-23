@@ -97,7 +97,7 @@ impl<'i, 'de> Visitor<'de> for VisitorFileSystemTiles<'i> {
     {
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
-                // "size" => self.ptr.target_w = map.next_value()?,
+                "target_width" => self.ptr.target_w = map.next_value()?,
                 _ => {
                     map.next_value::<serde_json::Value>()?;
                 }

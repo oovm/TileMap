@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::check_image_multiple;
 
 mod as_complete;
 
@@ -72,13 +73,7 @@ impl GridAtlas for GridEdgeWang {
         P: AsRef<Path>,
     {
         let image = image::open(path)?.to_rgba8();
-        let (w, h) = image.dimensions();
-        if w % 4 != 0 || h % 4 != 0 {
-            io_error(
-                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
-                ErrorKind::InvalidInput,
-            )?;
-        }
+        check_image_multiple(&image, 4, 4)?;
         Ok(Self { image })
     }
 }

@@ -138,7 +138,7 @@ impl TileAtlasData {
             TileAtlasData::Animation(v) => v.get_key(),
             TileAtlasData::GridCornerWang(v) => todo!(),
             TileAtlasData::GridEdge(v) => v.get_key(),
-            TileAtlasData::GridEdgeWang(v) => v.get_key(),
+            TileAtlasData::GridEdgeWang(v) => todo!(),
         }
     }
 }

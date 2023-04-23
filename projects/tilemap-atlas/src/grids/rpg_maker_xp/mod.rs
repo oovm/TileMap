@@ -12,6 +12,7 @@ pub struct GridCornerRMXP {
     cell_w: u32,
     cell_h: u32,
 }
+
 impl GridCornerRMXP {
     /// Create a new tile set from rpg maker xp atlas.
     ///

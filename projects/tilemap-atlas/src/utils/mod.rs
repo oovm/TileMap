@@ -1,4 +1,4 @@
-use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridAtlas, GridCompleteAtlas, GridCornerRMVX};
+use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridAtlas, GridCompleteAtlas, GridCornerRMVX, GridEdgeWang};
 use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
 use std::{
     collections::BTreeMap,
@@ -29,6 +29,7 @@ where
 
 pub struct AnimationSlice {}
 
+/// Create a new animation slice from image.
 pub fn grid_corner_mask(lu: bool, ru: bool, ld: bool, rd: bool) -> u8 {
     (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3
 }
@@ -209,8 +210,8 @@ where
     P: AsRef<Path>,
 {
     let (raw, output) = image_with_new_path(image)?;
-    let new = GridCompleteAtlas::from_edge4x4(&raw, raw.width() / 4, raw.height() / 4);
-    new.save(output)
+    let new = GridEdgeWang::create(&raw, (0, 0), (raw.width() / 4, raw.height() / 4))?;
+    new.as_complete().save(output)
 }
 
 /// Convert a 4x6 rpg tile set to complete set atlas

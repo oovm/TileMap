@@ -5,15 +5,11 @@ mod as_complete;
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerWang {
     image: RgbaImage,
-    cell_w: u32,
-    cell_h: u32,
 }
 
 impl GridAtlas for GridCornerWang {
     unsafe fn new(image: RgbaImage) -> Self {
-        let cell_w = image.width() / 4;
-        let cell_h = image.height() / 4;
-        Self { image, cell_w, cell_h }
+        Self { image }
     }
     /// Create a complete tile set without check.
     ///
@@ -26,11 +22,8 @@ impl GridAtlas for GridCornerWang {
     /// ```
     fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
         let (w, h) = image.dimensions();
-        if w % 4 != 0 || h % 4 != 0 {
-            io_error(
-                "The image width must be a multiple of 4 and the image height must be a multiple of 4",
-                ErrorKind::InvalidInput,
-            )?;
+        if origin.0 + size.0 * 4 > w || origin.1 + size.1 * 4 > h {
+            io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
         let view = image::imageops::crop_imm(image, origin.0, origin.1, size.0 * 4, size.1 * 4);
         // SAFETY: The image has been checked.
@@ -38,7 +31,7 @@ impl GridAtlas for GridCornerWang {
     }
 
     fn get_cell_size(&self) -> (u32, u32) {
-        (self.cell_w, self.cell_h)
+        (self.image.width() / 4, self.image.height() / 4)
     }
 
     fn get_image(&self) -> &RgbaImage {
@@ -46,8 +39,9 @@ impl GridAtlas for GridCornerWang {
     }
 
     fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage {
+        let (w, h) = self.get_cell_size();
         let (i, j) = wang4x4c_inner_mask(lu, ru, ld, rd);
-        self.image.view(i * self.cell_w, j * self.cell_h, self.cell_w, self.cell_h).to_image()
+        self.image.view(i * w, j * h, w, h).to_image()
     }
 
     fn get_by_side(&self, r: bool, u: bool, l: bool, d: bool) -> RgbaImage {
@@ -68,13 +62,13 @@ impl GridAtlas for GridCornerWang {
     {
         let image = image::open(path)?.to_rgba8();
         let (w, h) = image.dimensions();
-        if w % 6 != 0 || h % 8 != 0 {
+        if w % 4 != 0 || h % 4 != 0 {
             io_error(
                 "The image width must be a multiple of 6 and the image height must be a multiple of 8",
                 ErrorKind::InvalidInput,
             )?;
         }
-        Ok(Self { image, cell_w: w / 6, cell_h: h / 8 })
+        Ok(Self { image })
     }
 }
 

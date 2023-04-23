@@ -9,73 +9,19 @@ impl GridCompleteAtlas {
     /// <http://www.cr31.co.uk/stagecast/wang/blob_g.html>
     pub fn from_blob7x7a(source: &RgbaImage, width: u32, height: u32) -> RgbaImage {
         let mut target = RgbaImage::new(width * 12, height * 4);
-        unsafe {
-            // needed tiles
-            for mask in STANDARD_NEEDED {
-                let (sw, sh) = blob7x7_sub_image(mask);
-                let (tw, th) = complete_sub_image(mask);
-                let view = source.view(sw * width, sh * height, width, height);
-                target.copy_from(&*view, tw * width, th * height).unwrap_unchecked();
-            }
-            // default tile
-            let (sw, sh) = (0, 0);
-            let (tw, th) = (0, 3);
+        // needed tiles
+        for mask in STANDARD_NEEDED {
+            let (sw, sh) = blob7x7_sub_image(mask);
+            let (tw, th) = complete_sub_image(mask);
             let view = source.view(sw * width, sh * height, width, height);
-            target.copy_from(&*view, tw * width, th * height).unwrap_unchecked();
+            target.copy_from(&*view, tw * width, th * height).ok();
         }
+        // default tile
+        let (sw, sh) = (0, 0);
+        let (tw, th) = (0, 3);
+        let view = source.view(sw * width, sh * height, width, height);
+        target.copy_from(&*view, tw * width, th * height).ok();
         target
-    }
-    pub fn from_edge4x4(source: &RgbaImage, width: u32, height: u32) -> RgbaImage {
-        let mut target = RgbaImage::new(width * 12, height * 4);
-        for i in 0..12 {
-            for j in 0..4 {
-                let (sw, sh) = edge_to_complete((i, j));
-                let view = source.view(sw * width, sh * height, width, height);
-                unsafe {
-                    target.copy_from(&*view, i * width, j * height).unwrap_unchecked();
-                }
-            }
-        }
-        target
-    }
-}
-
-fn edge_to_complete((x, y): (u32, u32)) -> (u32, u32) {
-    match (x, y) {
-        (c, _) if c < 4 => (x, y),
-        (4, 0) => (2, 1),
-        (4, 1) => (1, 1),
-        (4, 2) => (1, 1),
-        (4, 3) => (2, 1),
-        (5, 0) => (2, 0),
-        (5, 1) => (2, 1),
-        (5, 2) => (2, 1),
-        (5, 3) => (2, 2),
-        (6, 0) => (2, 0),
-        (6, 1) => (2, 1),
-        (6, 2) => (2, 1),
-        (6, 3) => (2, 2),
-        (7, 0) => (2, 1),
-        (7, 1) => (3, 1),
-        (7, 2) => (3, 1),
-        (7, 3) => (2, 1),
-        (8, 0) => (1, 0),
-        (8, 1) => (1, 1),
-        (8, 2) => (2, 1),
-        (8, 3) => (1, 2),
-        (9, 0) => (2, 1),
-        (9, 1) => (2, 1),
-        (9, 2) => (2, 1),
-        (9, 3) => (2, 2),
-        (10, 0) => (2, 0),
-        (10, 1) => (0, 3), // empty
-        (10, 2) => (2, 1),
-        (10, 3) => (2, 1),
-        (11, 0) => (3, 0),
-        (11, 1) => (2, 1),
-        (11, 2) => (3, 1),
-        (11, 3) => (3, 2),
-        _ => unreachable!(),
     }
 }
 

@@ -2,91 +2,76 @@ use super::*;
 
 mod as_complete;
 
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+/// Create a complete tile set without check.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use tileset::GridCompleteAtlas;
+/// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+/// let tile_set = unsafe { GridCompleteAtlas::create(image) };
+/// ```
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridEdgeWang {
-    key: String,
-    cell_w: u32,
-    cell_h: u32,
+    image: RgbaImage,
 }
 
-// constructors
-impl GridEdgeWang {
-    pub fn new<S>(key: S, width: u32, height: u32) -> Self
+impl GridAtlas for GridEdgeWang {
+    unsafe fn new(image: RgbaImage) -> Self {
+        Self { image }
+    }
+    /// Create a complete tile set without check.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::GridCompleteAtlas;
+    /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+    /// let tile_set = unsafe { GridCompleteAtlas::create(image) };
+    /// ```
+    fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
+        let (w, h) = image.dimensions();
+        if origin.0 + size.0 * 4 > w || origin.1 + size.1 * 4 > h {
+            io_error("The image size has out of range", ErrorKind::InvalidInput)?;
+        }
+        let view = image::imageops::crop_imm(image, origin.0, origin.1, size.0 * 4, size.1 * 4);
+        // SAFETY: The image has been checked.
+        unsafe { Ok(Self::new(view.to_image())) }
+    }
+
+    fn get_cell_size(&self) -> (u32, u32) {
+        (self.image.width() / 4, self.image.height() / 4)
+    }
+
+    fn get_image(&self) -> &RgbaImage {
+        &self.image
+    }
+
+    fn get_by_corner(&self, ru: bool, rd: bool, ld: bool, lu: bool) -> RgbaImage {
+        panic!("can not get edge wang tile by corner ({} {} {} {})", ru, rd, ld, lu)
+    }
+
+    fn get_by_side(&self, u: bool, r: bool, d: bool, l: bool) -> RgbaImage {
+        todo!()
+    }
+
+    fn get_by_mask(&self, mask: u8) -> RgbaImage {
+        todo!()
+    }
+
+    fn load<P>(path: P) -> ImageResult<Self>
     where
-        S: ToString,
+        P: AsRef<Path>,
     {
-        Self { key: key.to_string(), cell_w: width, cell_h: height }
-    }
-}
-
-// getters
-impl GridEdgeWang {
-    /// Get Image
-    ///
-    /// # Arguments
-    ///
-    /// * `root`:
-    ///
-    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use tileset::GridCornerWang;
-    /// ```
-    pub fn get_key(&self) -> &str {
-        &self.key
-    }
-    /// Get Image
-    ///
-    /// # Arguments
-    ///
-    /// * `root`:
-    ///
-    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use tileset::GridCornerWang;
-    /// ```
-    pub fn get_path(&self, root: &Path) -> PathBuf {
-        root.join(&self.key)
-    }
-    /// Get Image
-    ///
-    /// # Arguments
-    ///
-    /// * `root`:
-    ///
-    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use tileset::GridCornerWang;
-    /// ```
-    pub fn get_image(&self, root: &Path) -> ImageResult<RgbaImage> {
-        Ok(image::open(self.get_path(root))?.to_rgba8())
-    }
-    /// Get Image
-    ///
-    /// # Arguments
-    ///
-    /// * `root`:
-    ///
-    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use tileset::GridCornerWang;
-    /// ```
-    pub fn get_corner(&self, root: &Path, lu: bool, ru: bool, ld: bool, rd: bool) -> ImageResult<RgbaImage> {
-        let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;
-        let image = self.get_image(root)?;
-        Ok(view_wang4x4e_cell(&image, mask).to_image())
+        let image = image::open(path)?.to_rgba8();
+        let (w, h) = image.dimensions();
+        if w % 4 != 0 || h % 4 != 0 {
+            io_error(
+                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
+                ErrorKind::InvalidInput,
+            )?;
+        }
+        Ok(Self { image })
     }
 }
 

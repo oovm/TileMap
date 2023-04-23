@@ -1,6 +1,6 @@
 use image::{
     error::{LimitError, LimitErrorKind},
-    ImageError, ImageResult, RgbaImage, SubImage,
+    ImageError, ImageResult, RgbaImage,
 };
 use std::{
     io::{Error, ErrorKind},
@@ -8,7 +8,6 @@ use std::{
 };
 
 use crate::{utils::save_as_png, GridCompleteAtlas};
-use rand_core::RngCore;
 
 /// A manager that can dynamically determine the required tiles.
 pub trait TilesProvider {}

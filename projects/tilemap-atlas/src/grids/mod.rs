@@ -9,7 +9,4 @@ use crate::{traits::io_error, utils::save_as_png, GridAtlas, GridCompleteAtlas};
 use image::{GenericImage, GenericImageView, ImageResult, RgbaImage, SubImage};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{
-    io::ErrorKind,
-    path::{Path, PathBuf},
-};
+use std::{io::ErrorKind, path::Path};

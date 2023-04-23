@@ -1,3 +1,4 @@
+#![doc = include_str!("readme.md")]
 use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridAtlas, GridCompleteAtlas, GridCornerRMVX, GridEdgeWang};
 use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
 use std::{
@@ -6,6 +7,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// Decompose image grids by cells count.
 pub fn decompose_image_grid_by_cells<P>(path: P, cols: u32, rows: u32) -> ImageResult<()>
 where
     P: AsRef<Path>,

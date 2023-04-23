@@ -52,11 +52,18 @@ impl GridAtlas for GridEdgeWang {
     }
 
     fn get_by_side(&self, u: bool, r: bool, d: bool, l: bool) -> RgbaImage {
-        todo!()
+        let (i, j) = wang4x4e_sub_image(u, r, d, l);
+        let (w, h) = self.get_cell_size();
+        let view = image::imageops::crop_imm(&self.image, i * w, j * h, w, h);
+        view.to_image()
     }
 
     fn get_by_mask(&self, mask: u8) -> RgbaImage {
-        todo!()
+        let u = mask >> 0 & 1 == 1;
+        let r = mask >> 2 & 1 == 1;
+        let d = mask >> 4 & 1 == 1;
+        let l = mask >> 6 & 1 == 1;
+        self.get_by_side(u, r, d, l)
     }
 
     fn load<P>(path: P) -> ImageResult<Self>
@@ -74,43 +81,43 @@ impl GridAtlas for GridEdgeWang {
         Ok(Self { image })
     }
 }
-
-// 0b0000 <- 0  <- (1, 4)
-// 0b0001 <- 2  <- (2, 4)
-// 0b0010 <- 1  <- (1, 3)
-// 0b0011 <- 3  <- (2, 3)
-// 0b0100 <- 8  <- (4, 4)
-// 0b0101 <- 10 <- (3, 4)
-// 0b0110 <- 9  <- (4, 3)
-// 0b0111 <- 11 <- (3, 3)
-// 0b1000 <- 4  <- (1, 1)
-// 0b1001 <- 6  <- (2, 1)
-// 0b1010 <- 5  <- (1, 2)
-// 0b1011 <- 7  <- (2, 2)
-// 0b1100 <- 12 <- (4, 1)
-// 0b1101 <- 14 <- (3, 1)
-// 0b1110 <- 13 <- (4, 2)
-// 0b1111 <- 15 <- (3, 2)
-fn view_wang4x4e_cell(r: &RgbaImage, mask: u8) -> SubImage<&RgbaImage> {
-    let w = r.width() / 4;
-    let h = r.height() / 4;
+/// ```js
+/// 0b0000 <- 0  <- (1, 4)
+/// 0b0001 <- 1  <- (1, 3)
+/// 0b0010 <- 2  <- (2, 4)
+/// 0b0011 <- 3  <- (2, 3)
+/// 0b0100 <- 4  <- (1, 1)
+/// 0b0101 <- 5  <- (1, 2)
+/// 0b0110 <- 6  <- (2, 1)
+/// 0b0111 <- 7  <- (2, 2)
+/// 0b1000 <- 8  <- (4, 4)
+/// 0b1001 <- 9  <- (4, 3)
+/// 0b1010 <- 10 <- (3, 4)
+/// 0b1011 <- 11 <- (3, 3)
+/// 0b1100 <- 12 <- (4, 1)
+/// 0b1101 <- 13 <- (4, 2)
+/// 0b1110 <- 14 <- (3, 1)
+/// 0b1111 <- 15 <- (3, 2)
+/// ```
+fn wang4x4e_sub_image(u: bool, r: bool, d: bool, l: bool) -> (u32, u32) {
+    let mask = (u as u8) << 0 | (r as u8) << 1 | (d as u8) << 2 | (l as u8) << 3;
     match mask {
-        0b0000 => r.view(0 * w, 3 * h, w, h),
-        0b0001 => r.view(1 * w, 3 * h, w, h),
-        0b0010 => r.view(0 * w, 2 * h, w, h),
-        0b0011 => r.view(1 * w, 2 * h, w, h),
-        0b0100 => r.view(3 * w, 3 * h, w, h),
-        0b0101 => r.view(2 * w, 3 * h, w, h),
-        0b0110 => r.view(3 * w, 2 * h, w, h),
-        0b0111 => r.view(2 * w, 2 * h, w, h),
-        0b1000 => r.view(0 * w, 0 * h, w, h),
-        0b1001 => r.view(1 * w, 0 * h, w, h),
-        0b1010 => r.view(0 * w, 1 * h, w, h),
-        0b1011 => r.view(1 * w, 1 * h, w, h),
-        0b1100 => r.view(3 * w, 0 * h, w, h),
-        0b1101 => r.view(2 * w, 0 * h, w, h),
-        0b1110 => r.view(3 * w, 1 * h, w, h),
-        0b1111 => r.view(2 * w, 1 * h, w, h),
+        0b0000 => (0, 3),
+        0b0001 => (0, 2),
+        0b0010 => (1, 3),
+        0b0011 => (1, 2),
+        0b0100 => (0, 0),
+        0b0101 => (0, 1),
+        0b0110 => (1, 0),
+        0b0111 => (1, 1),
+        0b1000 => (3, 3),
+        0b1001 => (3, 2),
+        0b1010 => (2, 3),
+        0b1011 => (2, 2),
+        0b1100 => (3, 0),
+        0b1101 => (3, 1),
+        0b1110 => (2, 0),
+        0b1111 => (2, 1),
         _ => unreachable!(),
     }
 }

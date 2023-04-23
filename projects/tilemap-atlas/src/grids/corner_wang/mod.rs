@@ -16,9 +16,10 @@ impl GridAtlas for GridCornerWang {
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCompleteAtlas;
+    /// # use tileset::{GridAtlas, GridCornerWang};
     /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
-    /// let tile_set = unsafe { GridCompleteAtlas::create(image) };
+    /// let tile_set =
+    ///     GridCornerWang::create(&image, (0, 0), (image.width() / 4, image.height() / 4)).unwrap();
     /// ```
     fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
         let (w, h) = image.dimensions();
@@ -38,21 +39,20 @@ impl GridAtlas for GridCornerWang {
         &self.image
     }
 
-    fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage {
+    fn get_by_corner(&self, ru: bool, rd: bool, ld: bool, lu: bool) -> RgbaImage {
         let (w, h) = self.get_cell_size();
         let (i, j) = wang4x4c_inner_mask(lu, ru, ld, rd);
         self.image.view(i * w, j * h, w, h).to_image()
     }
 
-    fn get_by_side(&self, r: bool, u: bool, l: bool, d: bool) -> RgbaImage {
+    fn get_by_side(&self, u: bool, r: bool, d: bool, l: bool) -> RgbaImage {
         panic!("can not get corner wang tile by side ({} {} {} {})", r, u, l, d)
     }
-
     fn get_by_mask(&self, mask: u8) -> RgbaImage {
-        let lu = (mask >> 7) & 1 == 1;
-        let ru = (mask >> 1) & 1 == 1;
-        let ld = (mask >> 5) & 1 == 1;
-        let rd = (mask >> 3) & 1 == 1;
+        let lu = mask >> 7 & 1 == 1;
+        let ru = mask >> 1 & 1 == 1;
+        let ld = mask >> 5 & 1 == 1;
+        let rd = mask >> 3 & 1 == 1;
         self.get_by_corner(lu, ru, ld, rd)
     }
 
@@ -64,7 +64,7 @@ impl GridAtlas for GridCornerWang {
         let (w, h) = image.dimensions();
         if w % 4 != 0 || h % 4 != 0 {
             io_error(
-                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
+                "The image width must be a multiple of 4 and the image height must be a multiple of 4",
                 ErrorKind::InvalidInput,
             )?;
         }
@@ -100,7 +100,7 @@ impl GridAtlas for GridCornerWang {
 /// 0b1111 <- 15 <- (3, 2)
 /// ```
 pub fn wang4x4c_inner_mask(lu: bool, ru: bool, ld: bool, rd: bool) -> (u32, u32) {
-    /// match [bool;4] directly has too many branch jumps
+    // match [bool;4] directly has too many branch jumps
     let mask = (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3;
     match mask {
         0b0000 => (0, 3),

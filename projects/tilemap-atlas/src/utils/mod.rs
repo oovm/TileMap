@@ -1,9 +1,13 @@
 #![doc = include_str!("readme.md")]
 use crate::{grids::rpg_maker_xp::GridCornerRMXP, GridAtlas, GridCompleteAtlas, GridCornerRMVX, GridEdgeWang};
-use image::{ColorType, GenericImageView, ImageFormat, ImageResult, RgbaImage};
+use image::{
+    error::{ParameterError, ParameterErrorKind},
+    ColorType, GenericImageView, ImageError, ImageFormat, ImageResult, RgbaImage,
+};
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
+    io::{Error, ErrorKind},
     path::{Path, PathBuf},
 };
 
@@ -29,6 +33,15 @@ where
     Ok(())
 }
 
+/// Create a new tile set from rpg maker xp atlas.
+///
+/// ## Example
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCompleteAtlas};
+/// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+/// let size = raw.get_cell_size();
+/// ```
 pub struct AnimationSlice {}
 
 /// Create a new animation slice from image.
@@ -36,6 +49,15 @@ pub fn grid_corner_mask(lu: bool, ru: bool, ld: bool, rd: bool) -> u8 {
     (lu as u8) << 0 | (ru as u8) << 1 | (ld as u8) << 2 | (rd as u8) << 3
 }
 
+/// Create a new tile set from rpg maker xp atlas.
+///
+/// ## Example
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCompleteAtlas};
+/// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+/// let size = raw.get_cell_size();
+/// ```
 #[derive(Debug)]
 pub struct MaskBuilder {
     map: BTreeMap<u8, (u32, u32)>,
@@ -222,7 +244,7 @@ where
     P: AsRef<Path>,
 {
     let (raw, output) = image_with_new_path(image)?;
-    let rpg = GridCornerRMVX::new(&raw, (0, 0), (raw.width() / 4, raw.height() / 6))?;
+    let rpg = GridCornerRMVX::create(&raw, (0, 0), (raw.width() / 4, raw.height() / 6))?;
     rpg.as_complete().save(output)
 }
 
@@ -232,7 +254,7 @@ where
     P: AsRef<Path>,
 {
     let (raw, output) = image_with_new_path(image)?;
-    let rpg = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8))?;
+    let rpg = GridCornerRMXP::create(&raw, (0, 0), (raw.width() / 6, raw.height() / 8))?;
     rpg.as_complete().save(output)
 }
 
@@ -253,4 +275,26 @@ where
     P: AsRef<Path>,
 {
     image::save_buffer_with_format(path, &image, image.width(), image.height(), ColorType::Rgba8, ImageFormat::Png)
+}
+
+pub(crate) fn parameter_error<T, S: ToString>(message: S) -> ImageResult<T> {
+    Err(ImageError::Parameter(ParameterError::from_kind(ParameterErrorKind::Generic(message.to_string()))))
+}
+
+pub(crate) fn io_error<T, S>(message: S, kind: ErrorKind) -> ImageResult<T>
+where
+    S: ToString,
+{
+    Err(ImageError::IoError(Error::new(kind, message.to_string())))
+}
+
+pub(crate) fn check_image_multiple(image: &RgbaImage, width: u32, height: u32) -> ImageResult<()> {
+    let (w, h) = image.dimensions();
+    if w % width != 0 {
+        parameter_error(format!("Image width {} is not a multiple of {}", w, width))?
+    }
+    if h % height != 0 {
+        parameter_error(format!("Image height {} is not a multiple of {}", h, height))?
+    }
+    Ok(())
 }

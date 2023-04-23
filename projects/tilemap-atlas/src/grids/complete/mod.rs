@@ -23,13 +23,22 @@ impl GridAtlas for GridCompleteAtlas {
         Self { image, cell_w, cell_h }
     }
 
+    /// Create a complete tile set without check.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCornerWang};
+    /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+    /// let tile_set =
+    ///     GridCornerWang::create(&image, (0, 0), (image.width() / 12, image.height() / 4)).unwrap();
+    /// ```
     fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
-        let max_x = x + 12 * w;
-        let max_y = y + 4 * h;
-        if max_x > image.width() || max_y > image.height() {
+        let (image_w, image_h) = image.dimensions();
+        if x + w * 12 > image_w || y + h * 4 > image_h {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        let view = image::imageops::crop_imm(image, x, y, w * 12, h * 4);
+        let view = image.view(x, y, w * 12, h * 4);
         // SAFETY: The image has been checked.
         unsafe { Ok(Self::new(view.to_image())) }
     }

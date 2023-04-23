@@ -25,16 +25,17 @@ impl GridAtlas for GridEdgeWang {
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCompleteAtlas;
+    /// # use tileset::{GridAtlas, GridCornerWang};
     /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
-    /// let tile_set = unsafe { GridCompleteAtlas::create(image) };
+    /// let tile_set =
+    ///     GridCornerWang::create(&image, (0, 0), (image.width() / 4, image.height() / 4)).unwrap();
     /// ```
-    fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
-        let (w, h) = image.dimensions();
-        if origin.0 + size.0 * 4 > w || origin.1 + size.1 * 4 > h {
+    fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let (image_w, image_h) = image.dimensions();
+        if x + w * 4 > image_w || y + h * 4 > image_h {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        let view = image::imageops::crop_imm(image, origin.0, origin.1, size.0 * 4, size.1 * 4);
+        let view = image.view(x, y, w * 4, h * 4);
         // SAFETY: The image has been checked.
         unsafe { Ok(Self::new(view.to_image())) }
     }
@@ -54,7 +55,7 @@ impl GridAtlas for GridEdgeWang {
     fn get_by_side(&self, u: bool, r: bool, d: bool, l: bool) -> RgbaImage {
         let (i, j) = wang4x4e_sub_image(u, r, d, l);
         let (w, h) = self.get_cell_size();
-        let view = image::imageops::crop_imm(&self.image, i * w, j * h, w, h);
+        let view = self.image.view(i * w, j * h, w, h);
         view.to_image()
     }
 

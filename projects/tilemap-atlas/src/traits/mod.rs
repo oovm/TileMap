@@ -1,17 +1,20 @@
-use image::{
-    error::{LimitError, LimitErrorKind},
-    ImageError, ImageResult, RgbaImage,
-};
-use std::{
-    io::{Error, ErrorKind},
-    path::Path,
-};
+use image::{ImageResult, RgbaImage};
+use std::path::Path;
 
 use crate::{utils::save_as_png, GridCompleteAtlas};
 
 /// A manager that can dynamically determine the required tiles.
 pub trait TilesProvider {}
 
+/// Create a new tile set from rpg maker xp atlas.
+///
+/// ## Example
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCompleteAtlas};
+/// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+/// let size = raw.get_cell_size();
+/// ```
 pub trait GridAtlas
 where
     Self: Sized + Clone + Send + Sync,
@@ -144,15 +147,4 @@ where
     {
         save_as_png(self.get_image(), path)
     }
-}
-
-pub fn dimension_error<T>() -> ImageResult<T> {
-    Err(ImageError::Limits(LimitError::from_kind(LimitErrorKind::DimensionError)))
-}
-
-pub fn io_error<T, S>(message: S, kind: ErrorKind) -> ImageResult<T>
-where
-    S: ToString,
-{
-    Err(ImageError::IoError(Error::new(kind, message.to_string())))
 }

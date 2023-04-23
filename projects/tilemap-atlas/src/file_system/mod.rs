@@ -1,6 +1,4 @@
-use crate::{
-    traits::io_error, AnimationFrame, GridAtlas, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas, TilesProvider,
-};
+use crate::{utils::io_error, AnimationFrame, GridAtlas, GridCornerWang, GridEdgeWang, GridSimpleAtlas, TilesProvider};
 
 use crate::utils::grid_corner_mask;
 use dashmap::DashMap;
@@ -19,6 +17,15 @@ mod ser;
 
 impl TilesProvider for FileSystemTiles {}
 
+/// Create a new tile set from rpg maker xp atlas.
+///
+/// ## Example
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCompleteAtlas};
+/// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+/// let size = raw.get_cell_size();
+/// ```
 #[derive(Clone, Debug)]
 pub struct FileSystemTiles {
     workspace: PathBuf,
@@ -52,9 +59,27 @@ impl FileSystemTiles {
             ),
         }
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn get_target_size(&self) -> (u32, u32) {
         (self.target_w.get(), self.target_h.get())
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn set_target_size(&mut self, width: u32, height: u32) -> ImageResult<()> {
         match NonZeroU32::new(width) {
             Some(w) => self.target_w = w,
@@ -66,27 +91,71 @@ impl FileSystemTiles {
         }
         self.write_json()
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn get_atlas(&self, name: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(name).map(|a| a.value().clone())
     }
-    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool, index: u8) -> Option<RgbaImage> {
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
+    pub fn get_corner(&self, name: &str, lu: bool, ru: bool, ld: bool, rd: bool, _: u8) -> Option<RgbaImage> {
         let mask = grid_corner_mask(lu, ru, ld, rd);
         match self.atlas.get(name)?.value() {
             TileAtlasData::SimpleSet(_) => None,
             TileAtlasData::Animation(_) => None,
             TileAtlasData::GridCornerWang(v) => Some(v.get_by_mask(mask)),
-            TileAtlasData::GridEdge(_) => None,
             TileAtlasData::GridEdgeWang(_) => None,
         }
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn get_side_atlas(&self, file: &str, _mask: u8) -> Option<TileAtlasData> {
         self.atlas.get(file).map(|a| a.value().clone())
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn insert_atlas(&self, file: &str, data: TileAtlasData) -> ImageResult<()> {
         self.atlas.insert(file.to_string(), data);
         self.write_json()?;
         Ok(())
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn update_atlas(&self, file: &str) -> ImageResult<()> {
         match self.atlas.get(file) {
             Some(_) => {
@@ -105,17 +174,61 @@ pub enum TileAtlasKind {
     GridCorner,
 }
 
+/// Create a new tile set from rpg maker xp atlas.
+///
+/// ## Example
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCompleteAtlas};
+/// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+/// let size = raw.get_cell_size();
+/// ```
 #[derive(Clone, Debug)]
 pub enum TileAtlasData {
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     SimpleSet(Box<GridSimpleAtlas>),
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     Animation(Box<AnimationFrame>),
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     GridCornerWang(Box<GridCornerWang>),
-    GridEdge(Box<GridEdgeAtlas>),
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     GridEdgeWang(Box<GridEdgeWang>),
 }
 
 impl Serialize for TileAtlasData {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, _: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -123,7 +236,7 @@ impl Serialize for TileAtlasData {
     }
 }
 impl<'de> Deserialize<'de> for TileAtlasData {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    fn deserialize<D>(_: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
@@ -132,13 +245,21 @@ impl<'de> Deserialize<'de> for TileAtlasData {
 }
 
 impl TileAtlasData {
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn get_name(&self) -> &str {
         match self {
             TileAtlasData::SimpleSet(v) => v.get_key(),
             TileAtlasData::Animation(v) => v.get_key(),
-            TileAtlasData::GridCornerWang(v) => todo!(),
-            TileAtlasData::GridEdge(v) => v.get_key(),
-            TileAtlasData::GridEdgeWang(v) => todo!(),
+            TileAtlasData::GridCornerWang(_) => todo!(),
+            TileAtlasData::GridEdgeWang(_) => todo!(),
         }
     }
 }

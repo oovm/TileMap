@@ -2,6 +2,16 @@ use super::*;
 use crate::GridAtlas;
 mod as_complete;
 
+/// Create a complete tile set without check.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use tileset::{GridAtlas, GridCornerWang};
+/// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
+/// let tile_set =
+///     GridCornerWang::create(&image, (0, 0), (image.width() / 4, image.height() / 4)).unwrap();
+/// ```
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerWang {
     image: RgbaImage,
@@ -21,12 +31,12 @@ impl GridAtlas for GridCornerWang {
     /// let tile_set =
     ///     GridCornerWang::create(&image, (0, 0), (image.width() / 4, image.height() / 4)).unwrap();
     /// ```
-    fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
-        let (w, h) = image.dimensions();
-        if origin.0 + size.0 * 4 > w || origin.1 + size.1 * 4 > h {
+    fn create(image: &RgbaImage, (x, y): (u32, u32), (w, h): (u32, u32)) -> ImageResult<Self> {
+        let (image_w, image_h) = image.dimensions();
+        if x + w * 4 > image_w || y + h * 4 > image_h {
             io_error("The image size has out of range", ErrorKind::InvalidInput)?;
         }
-        let view = image::imageops::crop_imm(image, origin.0, origin.1, size.0 * 4, size.1 * 4);
+        let view = image.view(x, y, w * 4, h * 4);
         // SAFETY: The image has been checked.
         unsafe { Ok(Self::new(view.to_image())) }
     }

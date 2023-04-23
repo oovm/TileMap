@@ -7,6 +7,15 @@ impl From<GridEdgeWang> for GridCompleteAtlas {
 }
 
 impl GridEdgeWang {
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn as_complete(&self) -> GridCompleteAtlas {
         let (w, h) = self.get_cell_size();
         let mut target = RgbaImage::new(w * 12, h * 4);

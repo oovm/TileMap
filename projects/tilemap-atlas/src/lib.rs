@@ -14,7 +14,7 @@ pub use crate::{
     animations::standard::AnimationFrame,
     file_system::{FileSystemTiles, TileAtlasData},
     grids::{
-        bg_set::GridSimpleAtlas, complete::GridCompleteAtlas, corner_wang::GridCornerWang, edge_set::GridEdgeAtlas,
+        bg_set::GridSimpleAtlas, complete::GridCompleteAtlas, corner_wang::GridCornerWang, edge_set::GridEdgeTiny,
         edge_wang::GridEdgeWang, rpg_maker_vx::GridCornerRMVX, rpg_maker_xp::GridCornerRMXP,
     },
     traits::{GridAtlas, TilesProvider},

@@ -16,19 +16,9 @@ mod as_complete;
 /// Suppose we have such an atlas in standard form called `atlas-std.png`;
 ///
 /// ```no_run
-/// # use tileset::GridEdgeAtlas;
+/// # use tileset::GridEdgeTiny;
 /// ```
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GridEdgeAtlas {
-    pub(crate) key: String,
-    pub(crate) cell_w: u32,
-    pub(crate) cell_h: u32,
-    pub(crate) count: [u32; 16],
-}
-
-impl GridEdgeAtlas {
-    pub fn get_key(&self) -> &str {
-        &self.key
-    }
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub struct GridEdgeTiny {
+    image: RgbaImage,
 }

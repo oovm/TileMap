@@ -7,6 +7,15 @@ use serde::{
 use std::fmt::Formatter;
 
 impl FileSystemTiles {
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn new<S>(workspace: S, width: u32, height: u32) -> ImageResult<Self>
     where
         S: AsRef<Path>,
@@ -29,6 +38,15 @@ impl FileSystemTiles {
         }
         Ok(())
     }
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
+    /// ```
     pub fn load<S>(workspace: S) -> ImageResult<Self>
     where
         S: AsRef<Path>,

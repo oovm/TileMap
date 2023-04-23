@@ -1,4 +1,6 @@
-use crate::{traits::io_error, AnimationFrame, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas, TilesProvider};
+use crate::{
+    traits::io_error, AnimationFrame, GridAtlas, GridCornerWang, GridEdgeAtlas, GridEdgeWang, GridSimpleAtlas, TilesProvider,
+};
 
 use crate::utils::grid_corner_mask;
 use dashmap::DashMap;

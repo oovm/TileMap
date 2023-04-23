@@ -3,6 +3,7 @@ members = ["projects/*"]
 default-members = [
     "projects/tilemap",
     "projects/tilemap-atlas",
+    "projects/tilemap-auto",
 ]
 exclude = [
     "projects/.DS_Store",

@@ -15,26 +15,26 @@ pub trait TilesProvider {}
 
 pub trait GridAtlas
 where
-    Self: Sized,
+    Self: Sized + Clone + Send + Sync,
 {
     /// Create a new tile set from rpg maker xp atlas.
     ///
     /// ## Example
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
-    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
     /// ```
-    fn new(image: RgbaImage);
+    unsafe fn new(image: RgbaImage) -> Self;
     /// Create a new tile set from rpg maker xp atlas.
     ///
     /// ## Example
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
-    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
     /// ```
     fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self>;
     /// Create a new tile set from rpg maker xp atlas.
@@ -42,50 +42,95 @@ where
     /// ## Example
     ///
     /// ```no_run
-    /// # use tileset::GridCornerRMXP;
-    /// let raw = image::open("assets/grass-xp.png").unwrap().to_rgba8();
-    /// let image = GridCornerRMXP::new(&raw, (0, 0), (raw.width() / 6, raw.height() / 8)).unwrap();
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let size = raw.get_cell_size();
     /// ```
-    fn get_cell_size(&self) -> u32;
-
+    fn get_cell_size(&self) -> (u32, u32);
+    /// Get the reference of raw image that owned by this tile set.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let raw: GridCompleteAtlas = GridAtlas::load("assets/grass-xp.png").unwrap();
+    /// let image = raw.get_image();
+    /// ```
     fn get_image(&self) -> &RgbaImage;
-
-    fn get_cell(&self, a: bool, b: bool, c: bool, d: bool, n: u32) -> SubImage<&RgbaImage>;
-    /// Get a tile by side relation mask.
-    #[inline]
-    fn get_side_random<R>(&self, a: bool, b: bool, c: bool, d: bool, rng: &mut R) -> SubImage<&RgbaImage>
-    where
-        R: RngCore,
-    {
-        self.get_cell(a, b, c, d, rng.next_u32())
-    }
-
+    ///  Create a new tile set from rpg maker xp atlas.
+    ///
+    /// # Arguments
+    ///
+    /// * `lu`: Left Up
+    /// * `ru`: Right Up
+    /// * `ld`: Left Down
+    /// * `rd`: Right Down
+    ///
+    /// returns: ImageBuffer<Rgba<u8>, Vec<u8, Global>>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
+    /// image.save("assets/standard/grass.png").unwrap();
+    /// ```
+    fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage;
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// # Arguments
+    ///
+    /// * `r`: Right
+    /// * `u`: Up
+    /// * `l`: Left
+    /// * `d`: Down
+    ///
+    /// returns: ImageBuffer<Rgba<u8>, Vec<u8, Global>>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
+    /// image.save("assets/standard/grass.png").unwrap();
+    /// ```
+    fn get_by_side(&self, r: bool, u: bool, l: bool, d: bool) -> RgbaImage;
+    /// Create a new tile set from rpg maker xp atlas.
+    ///
+    /// # Arguments
+    ///
+    /// * `mask`:
+    ///
+    /// returns: ImageBuffer<Rgba<u8>, Vec<u8, Global>>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
+    /// image.save("assets/standard/grass.png").unwrap();
+    /// ```
+    fn get_by_mask(&self, mask: u8) -> RgbaImage;
     /// Create the tile set from any image format, recommend use png.
     ///
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCompleteAtlas;
-    /// let image = GridCompleteAtlas::load("assets/standard/grass.png").unwrap();
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
     /// image.save("assets/standard/grass.png").unwrap();
     /// ```
     fn load<P>(path: P) -> ImageResult<Self>
     where
-        P: AsRef<Path>,
-    {
-        let image = image::open(path)?.to_rgba8();
-        let (w, h) = image.dimensions();
-        let (c, r) = Self::GRIDS;
-        Self::create(&image, (0, 0), (w / c, h / r))
-    }
+        P: AsRef<Path>;
     /// Save the tile set image to a png file, remember you need add `.png` suffix.
     ///
     /// # Examples
     ///
     /// ```no_run
-    /// # use tileset::GridCompleteAtlas;
-    /// let image = GridCompleteAtlas::load("assets/grass.png").unwrap();
-    /// image.save("assets/grass.png").unwrap();
+    /// # use tileset::{GridAtlas, GridCompleteAtlas};
+    /// let image: GridCompleteAtlas = GridAtlas::load("assets/standard/grass.png").unwrap();
+    /// image.save("assets/standard/grass.png").unwrap();
     /// ```
     fn save<P>(&self, path: P) -> ImageResult<()>
     where

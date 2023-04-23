@@ -9,14 +9,19 @@ pub struct GridCornerWang {
 }
 
 impl GridAtlas for GridCornerWang {
-    /// Create a complete tile set from image.
+    unsafe fn new(image: RgbaImage) -> Self {
+        let cell_w = image.width() / 4;
+        let cell_h = image.height() / 4;
+        Self { image, cell_w, cell_h }
+    }
+    /// Create a complete tile set without check.
     ///
     /// # Examples
     ///
     /// ```no_run
     /// # use tileset::GridCompleteAtlas;
     /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
-    /// let tile_set = GridCompleteAtlas::new(image).unwrap();
+    /// let tile_set = unsafe { GridCompleteAtlas::create(image) };
     /// ```
     fn create(image: &RgbaImage, origin: (u32, u32), size: (u32, u32)) -> ImageResult<Self> {
         let (w, h) = image.dimensions();
@@ -28,77 +33,50 @@ impl GridAtlas for GridCornerWang {
         }
         let view = image::imageops::crop_imm(image, origin.0, origin.1, size.0 * 4, size.1 * 4);
         // SAFETY: The image has been checked.
-        unsafe { Ok(Self::create(view.to_image())) }
+        unsafe { Ok(Self::new(view.to_image())) }
     }
 
-    const GRIDS: (u32, u32) = (4, 4);
-
-    fn get_cell_size(&self) -> u32 {
-        todo!()
+    fn get_cell_size(&self) -> (u32, u32) {
+        (self.cell_w, self.cell_h)
     }
 
     fn get_image(&self) -> &RgbaImage {
-        todo!()
+        &self.image
     }
 
-    fn get_cell(&self, a: bool, b: bool, c: bool, d: bool, n: u32) -> SubImage<&RgbaImage> {
-        todo!()
-    }
-}
-
-// constructors
-impl GridCornerWang {
-    /// Create a complete tile set without check.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use tileset::GridCompleteAtlas;
-    /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();
-    /// let tile_set = unsafe { GridCompleteAtlas::create(image) };
-    /// ```
-    pub unsafe fn create(image: RgbaImage) -> Self {
-        let cell_w = image.width() / 4;
-        let cell_h = image.height() / 4;
-        Self { image, cell_w, cell_h }
-    }
-}
-
-// getters
-impl GridCornerWang {
-    /// Get Image
-    ///
-    /// # Arguments
-    ///
-    /// * `root`:
-    ///
-    /// returns: Result<ImageBuffer<Rgba<u8>, Vec<u8, Global>>, ImageError>
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use tileset::GridCornerWang;
-    /// ```
-    pub fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage {
+    fn get_by_corner(&self, lu: bool, ru: bool, ld: bool, rd: bool) -> RgbaImage {
         let (i, j) = wang4x4c_inner_mask(lu, ru, ld, rd);
         self.image.view(i * self.cell_w, j * self.cell_h, self.cell_w, self.cell_h).to_image()
     }
-    pub fn get_by_mask(&self, mask: u8) -> RgbaImage {
+
+    fn get_by_side(&self, r: bool, u: bool, l: bool, d: bool) -> RgbaImage {
+        panic!("can not get corner wang tile by side ({} {} {} {})", r, u, l, d)
+    }
+
+    fn get_by_mask(&self, mask: u8) -> RgbaImage {
         let lu = (mask >> 7) & 1 == 1;
         let ru = (mask >> 1) & 1 == 1;
         let ld = (mask >> 5) & 1 == 1;
         let rd = (mask >> 3) & 1 == 1;
         self.get_by_corner(lu, ru, ld, rd)
     }
+
+    fn load<P>(path: P) -> ImageResult<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let image = image::open(path)?.to_rgba8();
+        let (w, h) = image.dimensions();
+        if w % 6 != 0 || h % 8 != 0 {
+            io_error(
+                "The image width must be a multiple of 6 and the image height must be a multiple of 8",
+                ErrorKind::InvalidInput,
+            )?;
+        }
+        Ok(Self { image, cell_w: w / 6, cell_h: h / 8 })
+    }
 }
 
-pub fn get_by_mask(mask: u8) -> (u32, u32) {
-    let lu = (mask >> 7) & 1 == 1;
-    let ru = (mask >> 1) & 1 == 1;
-    let ld = (mask >> 5) & 1 == 1;
-    let rd = (mask >> 3) & 1 == 1;
-    wang4x4c_inner_mask(lu, ru, ld, rd)
-}
 /// Get the sub image by index mask
 ///
 /// # Arguments

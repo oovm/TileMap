@@ -2,15 +2,14 @@ use super::*;
 
 mod as_complete;
 
-/// Create a complete tile set without check.
-///
-/// # Examples
+/// Wang tile connected by corner rule.
 ///
 /// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/corner-case.png)
 ///
-///
-///
 /// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/complete-atlas.png)
+///
+/// # Examples
+///
 ///
 /// ```no_run
 /// # use tileset::{GridAtlas, GridCornerWang};

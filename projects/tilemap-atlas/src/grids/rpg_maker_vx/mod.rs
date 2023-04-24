@@ -2,7 +2,7 @@ use super::*;
 use crate::utils::check_image_multiple;
 mod to_complete;
 
-/// A corner type tile set used in [RPG Maker VX](), [RPG MakerMV](), [RPG MakerMZ]().
+/// A corner type tile set used in [RPG Maker VX](https://store.steampowered.com/app/521880), [RPG Maker VX Ace](https://store.steampowered.com/app/220700), [RPG Maker MV](https://store.steampowered.com/app/363890), [RPG Maker MZ](https://store.steampowered.com/app/1096900).
 ///
 /// ## Example
 ///

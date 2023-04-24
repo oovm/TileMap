@@ -13,6 +13,10 @@ impl GridCornerRMXP {
     ///
     /// # Examples
     ///
+    /// - Input
+    ///
+    /// ![](https://raw.githubusercontent.com/oovm/TileMap/8dfdb57648ac8ff1b3b86ab7332994812e112e4b/projects/tilemap-atlas/tests/rpg6x8/forest.png)
+    ///
     /// ```no_run
     /// # use tileset::{GridAtlas, GridCornerRMXP};
     /// let rpg = GridCornerRMXP::load("assets/rpg4x6.png").unwrap();
@@ -36,6 +40,10 @@ impl GridCornerRMXP {
     /// This conversion may causes loss some detail
     ///
     /// # Examples
+    ///
+    /// - Input
+    ///
+    /// ![](https://raw.githubusercontent.com/oovm/TileMap/8dfdb57648ac8ff1b3b86ab7332994812e112e4b/projects/tilemap-atlas/tests/rpg6x8/forest.png)
     ///
     /// ```no_run
     /// # use tileset::{GridAtlas, GridCornerRMXP};

@@ -2,11 +2,13 @@ use super::*;
 
 mod to_complete;
 
-/// A corner type tile set used in [RPG Maker 2000](), [RPG Maker 2003](), [RPG Maker XP]().
+/// A corner type tile set used in [RPG Maker 2000](https://store.steampowered.com/app/383730), [RPG Maker 2003](https://store.steampowered.com/app/362870), [RPG Maker XP](https://store.steampowered.com/app/235900).
 ///
 /// ## Example
 ///
-/// ![]()
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/8dfdb57648ac8ff1b3b86ab7332994812e112e4b/projects/tilemap-atlas/tests/rpg6x8/forest.png)
+///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/8dfdb57648ac8ff1b3b86ab7332994812e112e4b/projects/tilemap-atlas/tests/rpg6x8/forest-std.png)
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCornerRMXP {
     image: RgbaImage,

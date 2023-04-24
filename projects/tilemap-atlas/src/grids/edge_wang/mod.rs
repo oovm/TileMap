@@ -4,6 +4,11 @@ use crate::utils::check_image_multiple;
 mod as_complete;
 
 /// Create a complete tile set without check.
+///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/edge-case.png)
+///
+///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/complete-atlas.png)
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridEdgeWang {
     image: RgbaImage,

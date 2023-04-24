@@ -6,6 +6,12 @@ mod as_complete;
 ///
 /// # Examples
 ///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/corner-case.png)
+///
+///
+///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/complete-atlas.png)
+///
 /// ```no_run
 /// # use tileset::{GridAtlas, GridCornerWang};
 /// let image = image::open("assets/standard/grass.png").unwrap().to_rgba8();

@@ -6,9 +6,11 @@ mod convert;
 ///
 /// # Examples
 ///
-/// ```no_run
-/// # use tileset::{GridAtlas, GridCompleteAtlas};
-/// ```
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/complete-case.png)
+///
+///
+///
+/// ![](https://raw.githubusercontent.com/oovm/TileMap/dev/projects/tilemap-atlas/assets/documents/1x/complete-atlas.png)
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GridCompleteAtlas {
     image: RgbaImage,
